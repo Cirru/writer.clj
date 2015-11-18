@@ -11,25 +11,11 @@ def initial-state $ {}
   :chance-used false
   :after-dollar false
 
-defn write-space (tree state)
-  update-in state ([] :code) $ fn (code)
-    str code "| "
-
-defn write-dollar (tree state)
-  update-in state ([] :code) $ fn (code)
-    str code "|\$"
-
-defn write-comma (tree state)
-  update-in state ([] :code) $ fn (code)
-    str code "|,"
-
-defn write-left-paren (tree state)
-  update-in state ([] :code) $ fn (code)
-    str code "|("
-
-defn write-right-paren (tree state)
-  update-in state ([] :code) $ fn (code)
-    str code "|)"
+def put-space $ partial write-raw "| "
+def put-dollar $ partial write-raw "|\$"
+def put-comma $ partial write-raw "|,"
+def put-left-paren $ partial write-raw "|("
+def put-right-paren $ partial write-raw "|)"
 
 defn write-string (tree state)
   update-in state ([] :code) $ fn (code)
@@ -47,20 +33,42 @@ defn write-token (tree state)
     write-raw tree state
 
 defn write-inline-expression (tree state)
+  ->>
+    put-left-paren
+    fn (tmp-state)
+      reduce
+        fn (acc branch)
+
+        , tmp-state tree
+    put-right-paren
 
 defn write-expression (tree state)
 
 defn write-line (tree state)
 
-defn write-newline (tree state)
+defn write-last-node (tree state)
+  if (string? tree)
+    write-token tree state
+    ->>
+      write-line tree
+      put-space
+      put-dollar
+
+defn write-inline-node (tree state)
+  if (string? tree)
+    write-token tree state
+    write-inline-expression tree state
+
+defn write-first-node (tree state)
+  write-inline-node tree state
+
+defn write-in-between-node (tree state)
+
+defn write-newline (state)
   update-in state ([] :code) $ fn (code)
     str code
       string/join |
         repeat (:indentation state) "| "
-
-defn write-toplevel-newline (tree state)
-  update-in state ([] :code) $ fn (code)
-    str code "|\n"
 
 defn write-toplevel-block (tree state)
 
@@ -69,9 +77,9 @@ defn write-program (tree state)
   reduce
     fn (acc branch)
       ->> acc
-        write-toplevel-newline tree
+        write-newline
         write-toplevel-block branch acc
-        write-toplevel-newline tree
+        write-newline
     , state tree
 
 defn write (tree)

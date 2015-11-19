@@ -39,9 +39,9 @@ defn put-right-paren (state)
 
 defn put-newline (state)
   update-in state ([] :code) $ fn (code)
-    str code
+    str code "|\n"
       string/join |
-        repeat (* 2 (:indentation state)) "| "
+        repeat (* 2 (:indentations state)) "| "
 
 -- "|control"
 
@@ -76,7 +76,7 @@ defn write-raw (tree state)
 
 defn write-token (tree state)
   if
-    re-find (re-pattern "[\\(\\)\\ \\\"]") tree
+    re-find (re-pattern "|[\\(\\)\\ \\\"]") tree
     write-string tree state
     write-raw tree state
 
@@ -86,20 +86,20 @@ defn write-inline-line (tree state)
       fn (acc branch)
         ->> acc
           put-space
-          write-inline-node
+          write-inline-node branch
       write-inline-node (first tree) state
       rest tree
 
 defn write-inline-expression (tree state)
-  ->>
+  ->> state
     put-left-paren
     write-inline-line tree
     put-right-paren
 
 defn write-block (tree state)
   case (count tree)
-    0 $ throw "|nothing to write as line"
-    1 $ write-last-node tree state
+    0 $ throw $ Exception. "|nothing to write as line"
+    1 $ write-first-node (first tree) state
     let
         head $ first tree
         between $ rest $ butlast tree
@@ -107,22 +107,33 @@ defn write-block (tree state)
         body-handler $ fn (next-state)
           reduce
             fn (acc branch)
-              write-in-between-node
+              write-in-between-node branch acc
             , next-state between
       ->> state
         write-first-node head
+        control-inline
         body-handler
         write-last-node tail
         control-outline
 
 defn write-last-node (tree state)
-  if (string? tree)
-    write-token tree state
-    ->>
-      put-space
-      put-dollar
-      put-space
-      write-block tree
+  if (:is-inline state)
+    if (string? tree)
+      ->> state
+        put-space
+        write-token tree
+      if (> (count tree) 0)
+        ->> state
+          put-space
+          put-dollar
+          put-space
+          control-inline
+          write-block (first tree)
+          control-outline
+        ->> state
+          put-space
+          put-dollar
+    write-in-between-node tree state
 
 defn write-inline-node (tree state)
   if (string? tree)
@@ -142,24 +153,37 @@ defn write-in-between-node (tree state)
         ->> state
           put-newline
           control-indent
+          control-inline
           write-block tree
+          control-outline
           control-unindent
           control-outline
-        ->> state
-          put-space
-          write-inline-expression tree
-          control-take-chance
+        if (is-simple-expression tree)
+          ->> state
+            put-space
+            write-inline-expression tree
+            control-take-chance
+          ->> state
+            put-newline
+            control-indent
+            control-inline
+            write-block tree
+            control-outline
+            control-unindent
     if (string? tree)
       ->> state
         put-newline
         put-comma
+        control-inline
         control-give-chance
         put-space
         write-token tree
       ->> state
         put-newline
         control-indent
+        control-inline
         write-block tree
+        control-outline
         control-unindent
 
 defn write-program (tree state)
@@ -169,10 +193,12 @@ defn write-program (tree state)
         put-newline
         control-indent
         control-give-chance
+        control-inline
         write-block branch
+        control-outline
         control-unindent
         put-newline
     , state tree
 
 defn write (tree)
-  :code $ write-program initial-state tree
+  :code $ write-program tree initial-state

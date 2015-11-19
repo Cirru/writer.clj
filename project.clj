@@ -3,6 +3,7 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.7.0"]]
-  :plugins [[cirru/lein-sepal "0.0.10"]]
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [cheshire "5.5.0"]]
+  :plugins [[cirru/lein-sepal "0.0.11"]]
   :cirru-sepal {:paths ["cirru-src" "cirru-test"]})

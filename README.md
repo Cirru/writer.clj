@@ -1,7 +1,12 @@
 
-# Cirru Writer in Clojure
+## Cirru Writer in Clojure
 
 Format Cirru code in Clojure.
+
+### Where's Clojure code
+
+Code for `src/` is generated via code in `cirru-src`, so I do not want to commit code twice.
+You can still read [Sepal.clj](https://github.com/Cirru/sepal.clj) like reading Clojure.
 
 ## Usage
 

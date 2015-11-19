@@ -6,19 +6,64 @@ ns cirru.writer
 def initial-state $ {}
   :code |
   :indentations 0
-  :index 0
   :is-inline false
   :chance-used false
-  :after-dollar false
 
 defn is-simple-expression (tree)
   every? string? tree
 
-def put-space $ partial write-raw "| "
-def put-dollar $ partial write-raw "|\$"
-def put-comma $ partial write-raw "|,"
-def put-left-paren $ partial write-raw "|("
-def put-right-paren $ partial write-raw "|)"
+-- "|declare"
+
+declare write-raw
+declare write-inline-node
+declare write-last-node
+declare write-first-node
+declare write-in-between-node
+
+-- "|put"
+
+defn put-space (state)
+  write-raw "| " state
+
+defn put-dollar (state)
+  write-raw "|\$" state
+
+defn put-comma (state)
+  write-raw "|," state
+
+defn put-left-paren (state)
+  write-raw "|(" state
+
+defn put-right-paren (state)
+  write-raw "|)" state
+
+defn put-newline (state)
+  update-in state ([] :code) $ fn (code)
+    str code
+      string/join |
+        repeat (* 2 (:indentation state)) "| "
+
+-- "|control"
+
+defn control-indent (state)
+  update-in state ([] :indentations) inc
+
+defn control-unindent (state)
+  update-in state ([] :indentations) dec
+
+defn control-inline (state)
+  assoc state :is-inline true
+
+defn control-outline (state)
+  assoc state :is-inline false
+
+defn control-give-chance (state)
+  assoc state :chance-used false
+
+defn control-take-chance (state)
+  assoc state :chance-used true
+
+-- "|writers"
 
 defn write-string (tree state)
   update-in state ([] :code) $ fn (code)
@@ -51,22 +96,24 @@ defn write-inline-expression (tree state)
     write-inline-line tree
     put-right-paren
 
-defn write-line (tree state)
+defn write-block (tree state)
   case (count tree)
-    0 $ error "|nothing to write as line"
+    0 $ throw "|nothing to write as line"
     1 $ write-last-node tree state
     let
         head $ first tree
         between $ rest $ butlast tree
         tail $ last tree
-      ->>
-        write-first-node head
-        fn (next-state)
+        body-handler $ fn (next-state)
           reduce
             fn (acc branch)
               write-in-between-node
             , next-state between
+      ->> state
+        write-first-node head
+        body-handler
         write-last-node tail
+        control-outline
 
 defn write-last-node (tree state)
   if (string? tree)
@@ -75,7 +122,7 @@ defn write-last-node (tree state)
       put-space
       put-dollar
       put-space
-      write-line tree
+      write-block tree
 
 defn write-inline-node (tree state)
   if (string? tree)
@@ -86,21 +133,45 @@ defn write-first-node (tree state)
   write-inline-node tree state
 
 defn write-in-between-node (tree state)
-
-defn write-newline (state)
-  update-in state ([] :code) $ fn (code)
-    str code
-      string/join |
-        repeat (:indentation state) "| "
-
+  if (:is-inline state)
+    if (string? tree)
+      ->> state
+        put-space
+        write-token tree
+      if (:chance-used state)
+        ->> state
+          put-newline
+          control-indent
+          write-block tree
+          control-unindent
+          control-outline
+        ->> state
+          put-space
+          write-inline-expression tree
+          control-take-chance
+    if (string? tree)
+      ->> state
+        put-newline
+        put-comma
+        control-give-chance
+        put-space
+        write-token tree
+      ->> state
+        put-newline
+        control-indent
+        write-block tree
+        control-unindent
 
 defn write-program (tree state)
   reduce
     fn (acc branch)
       ->> acc
-        write-newline
-        write-line branch acc
-        write-newline
+        put-newline
+        control-indent
+        control-give-chance
+        write-block branch
+        control-unindent
+        put-newline
     , state tree
 
 defn write (tree)

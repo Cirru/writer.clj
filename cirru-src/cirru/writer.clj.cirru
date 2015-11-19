@@ -2,6 +2,7 @@
 ns cirru.writer
   :require
     [] clojure.string :as string
+    [] clojure.pprint :as pprint
 
 def initial-state $ {}
   :code |
@@ -68,7 +69,7 @@ defn control-take-chance (state)
 defn write-string (tree state)
   update-in state ([] :code) $ fn (code)
     str code
-      with-out-str $ clojure.pprint/write tree
+      with-out-str $ pprint/write tree
 
 defn write-raw (tree state)
   update-in state ([] :code) $ fn (code)
@@ -128,7 +129,8 @@ defn write-last-node (tree state)
           put-dollar
           put-space
           control-inline
-          write-block (first tree)
+          control-give-chance
+          write-block tree
           control-outline
         ->> state
           put-space
@@ -154,6 +156,7 @@ defn write-in-between-node (tree state)
           put-newline
           control-indent
           control-inline
+          control-give-chance
           write-block tree
           control-outline
           control-unindent
@@ -167,6 +170,7 @@ defn write-in-between-node (tree state)
             put-newline
             control-indent
             control-inline
+            control-give-chance
             write-block tree
             control-outline
             control-unindent
@@ -182,6 +186,7 @@ defn write-in-between-node (tree state)
         put-newline
         control-indent
         control-inline
+        control-give-chance
         write-block tree
         control-outline
         control-unindent
@@ -192,8 +197,8 @@ defn write-program (tree state)
       ->> acc
         put-newline
         control-indent
-        control-give-chance
         control-inline
+        control-give-chance
         write-block branch
         control-outline
         control-unindent

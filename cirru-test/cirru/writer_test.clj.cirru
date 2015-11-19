@@ -5,6 +5,24 @@ ns cirru.writer-test
     [] cirru.writer :refer :all
     [] cheshire.core :refer $ [] decode
 
+deftest demo-test
+  testing "|writing case for demo"
+    is $ =
+      write $ decode $ slurp |resources/ast/demo.json
+      slurp |resources/cirru/demo.cirru
+
+deftest folding-test
+  testing "|writing case for folding"
+    is $ =
+      write $ decode $ slurp |resources/ast/folding.json
+      slurp |resources/cirru/folding.cirru
+
+deftest indent-test
+  testing "|writing case for indent"
+    is $ =
+      write $ decode $ slurp |resources/ast/indent.json
+      slurp |resources/cirru/indent.cirru
+
 deftest line-test
   testing "|writing case for line"
     is $ =

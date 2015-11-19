@@ -1,16 +1,28 @@
 
 ## Cirru Writer in Clojure
 
+[![Clojars Project](http://clojars.org/cirru/writer/latest-version.svg)](http://clojars.org/cirru/writer)
+
 Format Cirru code in Clojure.
+
+```clojure
+[cirru/writer "0.0.1"]
+```
 
 ### Where's Clojure code
 
 Code for `src/` and `test/` is generated via code in `cirru-src`, so I do not want to commit code twice.
 You can still read [Sepal.clj](https://github.com/Cirru/sepal.clj) like reading Clojure.
 
-## Usage
+### API Usage
 
 ```clojure
+(ns cirru.writer-test
+  (:require [clojure.test :refer :all]
+            [cirru.writer :refer :all]
+            [cheshire.core :refer [decode]]))
+
+(write [["cirru" "ast"] ["c" ["d" "e"]]])
 ```
 
 ## License

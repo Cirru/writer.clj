@@ -112,12 +112,14 @@
     :source-paths #{"cirru-src"})
   (comp
     (transform-cirru)
-    (cljs :optimizations :simple :compiler-options {:target :nodejs})
+    (cljs :optimizations :advanced :compiler-options {:target :nodejs})
     (target)))
 
 (deftask build []
+  (set-env!
+    :source-paths #{"cirru-src"})
   (comp
-    (compile-cirru)
+    (transform-cirru)
     (pom)
     (jar)
     (install)

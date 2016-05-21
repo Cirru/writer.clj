@@ -4,7 +4,7 @@ ns writer.component.container $ :require
   [] writer.core :refer $ [] write
 
 defn init-state ()
-  , |[]
+  , "|[[\"demo\",\"json here...\"],[\"arrays\",\"only\"]]"
 
 defn update-state (state new-content)
   , new-content

@@ -1,12 +1,14 @@
 
 ## Cirru Writer in Clojure
 
+> Format Cirru code in Clojure.
+
 [![Clojars Project](http://clojars.org/cirru/writer/latest-version.svg)](http://clojars.org/cirru/writer)
 
-Format Cirru code in Clojure.
+Demo http://repo.cirru.org/writer.clj/
 
 ```clojure
-[cirru/writer "0.0.1"]
+[cirru/writer "0.0.2"]
 ```
 
 ### Where's Clojure code
@@ -19,29 +21,32 @@ You can still read [Sepal.clj](https://github.com/Cirru/sepal.clj) like reading 
 ```clojure
 (ns cirru.writer-test
   (:require [clojure.test :refer :all]
-            [cirru.writer :refer :all]
-            [cheshire.core :refer [decode]]))
+            [cirru.writer :refer [write]]))
 
 (write [["cirru" "ast"] ["c" ["d" "e"]]])
 ```
 
 ### npm usage
 
-Only available in Node.js , not in browser. And a whole ClojureScript runtime is inside.
+It's 100k after optimization since a ClojureScript runtime is inside.
 
 ```bash
 npm i --save cirru-writer-clj
 ```
 
 ```js
-writer = require('cirru-writer')
+writer = require('cirru-writer-clj')
 
 writer.write([['console.log', '1'], ['console.log', '2']])
 ```
 
+To build CommonJS compatible code:
+
+```bash
+boot build-commonjs
+vim target/main.js # ...remove shebang manually
+```
+
 ## License
 
-Copyright © 2015 jiyinyiyong
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+MIT

@@ -141,8 +141,10 @@ defn write-block (tree state)
       ->> state (write-first-node head)
         control-inline
         control-after-vector false
+        control-indent
         body-handler
         write-last-node tail
+        control-unindent
         control-outline
 
 defn write-last-node (tree state)
@@ -157,6 +159,7 @@ defn write-last-node (tree state)
         > (count tree)
           , 0
         ->> state (put-space)
+          control-unindent
           put-dollar
           put-space
           control-dollar false
@@ -164,6 +167,7 @@ defn write-last-node (tree state)
           control-give-chance
           write-block tree
           control-outline
+          control-indent
         ->> state (put-space)
           write-raw "|()"
 
@@ -189,7 +193,7 @@ defn write-in-between-node (tree state)
         control-give-chance
         put-space
         write-token tree
-        control-after-vector false
+        control-after-vector true
 
     cond
       (nested? tree)
@@ -201,8 +205,8 @@ defn write-in-between-node (tree state)
                 control-inline
                 control-after-vector false
                 write-block branch
-                control-outline
                 control-unindent
+                control-outline
 
             , state tree
 
@@ -215,26 +219,22 @@ defn write-in-between-node (tree state)
           control-after-vector true
 
       :else $ ->> state (put-newline)
-        control-indent
         control-inline
         control-give-chance
         write-block tree
         control-outline
-        control-unindent
         control-after-vector true
 
 defn write-program (tree state)
   reduce
     fn (acc branch)
       ->> acc (put-newline)
-        control-indent
         control-inline
         control-give-chance
         control-after-vector false
         control-dollar true
         write-block branch
         control-outline
-        control-unindent
         put-newline
 
     , state tree

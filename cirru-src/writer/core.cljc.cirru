@@ -7,9 +7,15 @@ def initial-state $ {} (:code |)
   :indentations 0
   :is-inline false
   :chance-used false
+  :dollar-ok? true
+  :after-vector? false
 
 defn is-simple-expression (tree)
   every? string? tree
+
+defn nested? (tree)
+  and (vector? tree)
+    every? vector? tree
 
 -- |declare
 
@@ -70,12 +76,18 @@ defn control-give-chance (state)
 defn control-take-chance (state)
   assoc state :chance-used true
 
+defn control-dollar (new-value state)
+  assoc state :dollar-ok? new-value
+
+defn control-after-vector (new-value state)
+  assoc state :after-vector? new-value
+
 -- |writers
 
 defn write-string (tree state)
   update-in state ([] :code)
     fn (code)
-      str code pr-str tree
+      str code $ pr-str tree
 
 defn write-raw (tree state)
   update-in state ([] :code)
@@ -120,17 +132,24 @@ defn write-block (tree state)
         body-handler $ fn (next-state)
           reduce
             fn (acc branch)
-              write-in-between-node branch acc
+              ->> acc
+                control-dollar $ :dollar-ok? next-state
+                write-in-between-node branch
+
             , next-state between
 
       ->> state (write-first-node head)
         control-inline
+        control-after-vector false
         body-handler
         write-last-node tail
         control-outline
 
 defn write-last-node (tree state)
-  if (:is-inline state)
+  if
+    and
+      not $ :after-vector? state
+      :dollar-ok? state
     if (string? tree)
       ->> state (put-space)
         write-token tree
@@ -140,14 +159,16 @@ defn write-last-node (tree state)
         ->> state (put-space)
           put-dollar
           put-space
+          control-dollar false
           control-inline
           control-give-chance
           write-block tree
           control-outline
         ->> state (put-space)
-          put-dollar
+          write-raw "|()"
 
-    write-in-between-node tree state
+    ->> state (control-dollar true)
+      write-in-between-node tree
 
 defn write-inline-node (tree state)
   if (string? tree)
@@ -158,45 +179,49 @@ defn write-first-node (tree state)
   write-inline-node tree state
 
 defn write-in-between-node (tree state)
-  if (:is-inline state)
-    if (string? tree)
+  if (string? tree)
+    if (:is-inline state)
       ->> state (put-space)
         write-token tree
-      if (:chance-used state)
-        ->> state (put-newline)
-          control-indent
-          control-inline
-          control-give-chance
-          write-block tree
-          control-outline
-          control-unindent
-          control-outline
-        if (is-simple-expression tree)
-          ->> state (put-space)
-            write-inline-expression tree
-            control-take-chance
-          ->> state (put-newline)
-            control-indent
-            control-inline
-            control-give-chance
-            write-block tree
-            control-outline
-            control-unindent
-
-    if (string? tree)
       ->> state (put-newline)
         put-comma
         control-inline
         control-give-chance
         put-space
         write-token tree
-      ->> state (put-newline)
+        control-after-vector false
+
+    cond
+      (nested? tree)
+        ->>
+          reduce
+            fn (acc branch)
+              ->> acc (control-indent)
+                put-newline
+                control-inline
+                control-after-vector false
+                write-block branch
+                control-outline
+                control-unindent
+
+            , state tree
+
+          control-after-vector true
+
+      (and (not $ :chance-used state) (not $ :after-vector? state) (is-simple-expression tree))
+        ->> state (put-space)
+          write-inline-expression tree
+          control-take-chance
+          control-after-vector true
+
+      :else $ ->> state (put-newline)
         control-indent
         control-inline
         control-give-chance
         write-block tree
         control-outline
         control-unindent
+        control-after-vector true
 
 defn write-program (tree state)
   reduce
@@ -205,6 +230,8 @@ defn write-program (tree state)
         control-indent
         control-inline
         control-give-chance
+        control-after-vector false
+        control-dollar true
         write-block branch
         control-outline
         control-unindent

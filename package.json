@@ -2,7 +2,7 @@
   "name": "cirru-writer-clj",
   "version": "0.0.2",
   "description": "Cirru writer in Clojure",
-  "main": "index.js",
+  "main": "target/main.js",
   "directories": {
     "example": "examples"
   },

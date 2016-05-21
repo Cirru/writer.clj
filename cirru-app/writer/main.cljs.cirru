@@ -24,7 +24,8 @@ defn -main ()
   add-watch states-ref :changes render-app
   println "|app started!"
 
-set! js/window.onload -main
+if (some? js/window)
+  set! js/window.onload -main
 
 defn on-jsload ()
   render-app

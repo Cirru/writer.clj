@@ -1,10 +1,5 @@
 
 (set-env!
- :asset-paths #{"assets"}
- :source-paths #{"cirru-src"}
- :resource-paths #{}
-
- :dev-dependencies '[]
  :dependencies '[[org.clojure/clojurescript "1.8.40"      :scope "test"]
                  [org.clojure/clojure       "1.8.0"       :scope "test"]
                  [adzerk/boot-test          "1.1.1"       :scope "test"]
@@ -39,6 +34,8 @@
        :license     {"MIT" "http://opensource.org/licenses/mit-license.php"}})
 
 (deftask compile-cirru []
+  (set-env!
+    :source-paths #{"cirru-src" "cirru-app"})
   (cirru-sepal :paths ["cirru-src" "cirru-test"]))
 
 (defn html-dsl [data fileset]
@@ -69,6 +66,8 @@
         (commit!)))))
 
 (deftask dev []
+  (set-env!
+    :source-paths #{"cirru-src" "cirru-app"})
   (comp
     (html-file :data {:build? false})
     (watch)
@@ -78,6 +77,8 @@
     (target)))
 
 (deftask build-simple []
+  (set-env!
+    :source-paths #{"cirru-src" "cirru-app"})
   (comp
     (transform-cirru)
     (cljs :optimizations :simple)
@@ -85,6 +86,8 @@
     (target)))
 
 (deftask build-advanced []
+  (set-env!
+    :source-paths #{"cirru-src" "cirru-app"})
   (comp
     (transform-cirru)
     (cljs :optimizations :advanced)
@@ -103,8 +106,16 @@
     (build-simple)
     (rsync)))
 
+; package for nodejs only, not browsers, disappointed :(
+(deftask build-commonjs []
+  (set-env!
+    :source-paths #{"cirru-src"})
+  (comp
+    (transform-cirru)
+    (cljs :optimizations :simple :compiler-options {:target :nodejs})
+    (target)))
+
 (deftask build []
-  (set-env! :resource-paths #{"src/"})
   (comp
     (compile-cirru)
     (pom)
@@ -119,10 +130,7 @@
 
 (deftask watch-test []
   (set-env!
-   :asset-paths #{}
-   :source-paths #{"cirru-src" "cirru-test"}
-   :resource-paths #{})
-
+   :source-paths #{"cirru-src" "cirru-test"})
   (comp
     (watch)
     (transform-cirru)

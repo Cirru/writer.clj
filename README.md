@@ -25,6 +25,20 @@ You can still read [Sepal.clj](https://github.com/Cirru/sepal.clj) like reading 
 (write [["cirru" "ast"] ["c" ["d" "e"]]])
 ```
 
+### npm usage
+
+Only available in Node.js , not in browser. And a whole ClojureScript runtime is inside.
+
+```bash
+npm i --save cirru-writer-clj
+```
+
+```js
+writer = require('cirru-writer')
+
+writer.write([['console.log', '1'], ['console.log', '2']])
+```
+
 ## License
 
 Copyright © 2015 jiyinyiyong

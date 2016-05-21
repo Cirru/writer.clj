@@ -1,0 +1,22 @@
+{
+  "name": "cirru-writer-clj",
+  "version": "0.0.2",
+  "description": "Cirru writer in Clojure",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cirru/writer.clj.git"
+  },
+  "author": "jiyinyiyong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Cirru/writer.clj/issues"
+  },
+  "homepage": "https://github.com/Cirru/writer.clj#readme"
+}

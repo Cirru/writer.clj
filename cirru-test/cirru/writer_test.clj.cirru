@@ -52,3 +52,9 @@ deftest unfolding-test
     is $ =
       write $ decode $ slurp |resources/ast/unfolding.json
       slurp |resources/cirru/unfolding.cirru
+
+deftest inline-let-test
+  testing "|writing case for inline-let"
+    is $ =
+      write $ decode $ slurp |resources/ast/inline-let.json
+      slurp |resources/cirru/inline-let.cirru

@@ -2,7 +2,6 @@
 ns cirru.writer
   :require
     [] clojure.string :as string
-    [] clojure.pprint :as pprint
 
 def initial-state $ {}
   :code |
@@ -68,8 +67,7 @@ defn control-take-chance (state)
 
 defn write-string (tree state)
   update-in state ([] :code) $ fn (code)
-    str code
-      with-out-str $ pprint/write tree
+    str code pr-str tree
 
 defn write-raw (tree state)
   update-in state ([] :code) $ fn (code)

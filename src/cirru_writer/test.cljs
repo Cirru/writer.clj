@@ -17,6 +17,15 @@
     (slurp "examples/cirru/spaces.cirru")))))
 
 (deftest
+ patel-test
+ (testing
+  "writing case for patel"
+  (is
+   (=
+    (write (read-string (slurp "examples/ast/patel.edn")))
+    (slurp "examples/cirru/patel.cirru")))))
+
+(deftest
  indent-test
  (testing
   "writing case for indent"

@@ -13,7 +13,7 @@ Cirru Writer in Clojure
 ```
 
 ```clojure
-(cirru-writer/write [["cirru" "ast"] ["c" ["d" "e"]]])
+(cirru-writer.core/write [["cirru" "ast"] ["c" ["d" "e"]]])
 ```
 
 ### Develop

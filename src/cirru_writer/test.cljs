@@ -17,15 +17,6 @@
     (slurp "examples/cirru/spaces.cirru")))))
 
 (deftest
- patel-test
- (testing
-  "writing case for patel"
-  (is
-   (=
-    (write (read-string (slurp "examples/ast/patel.edn")))
-    (slurp "examples/cirru/patel.cirru")))))
-
-(deftest
  indent-test
  (testing
   "writing case for indent"
@@ -60,6 +51,15 @@
    (=
     (write (read-string (slurp "examples/ast/folding.edn")))
     (slurp "examples/cirru/folding.cirru")))))
+
+(deftest
+ double-nesting-test
+ (testing
+  "writing case for demo"
+  (is
+   (=
+    (write (read-string (slurp "examples/ast/double-nesting.edn")))
+    (slurp "examples/cirru/double-nesting.cirru")))))
 
 (deftest
  demo-test
@@ -97,6 +97,6 @@
     (write (read-string (slurp "examples/ast/unfolding.edn")))
     (slurp "examples/cirru/unfolding.cirru")))))
 
-(defn main! [] (run-tests))
+(defn main! [] (double-nesting-test))
 
 (defn reload! [] (main!))

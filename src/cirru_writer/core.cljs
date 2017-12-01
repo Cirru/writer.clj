@@ -13,7 +13,7 @@
 
 (declare write-inline-expression)
 
-(defn control-inline [state] (assoc state :is-inline true))
+(defn control-inline [state] (assoc state :inline? true))
 
 (defn write-raw [tree state] (update-in state [:code] (fn [code] (str code tree))))
 
@@ -45,15 +45,15 @@
 (defn write-inline-node [tree state]
   (if (string? tree) (write-token tree state) (write-inline-expression tree state)))
 
-(defn control-outline [state] (assoc state :is-inline false))
+(defn control-outline [state] (assoc state :inline? false))
 
-(defn control-take-chance [state] (assoc state :chance-used true))
+(defn control-take-chance [state] (assoc state :chance-used? true))
 
 (defn control-dollar [new-value state] (assoc state :dollar-ok? new-value))
 
 (defn nested? [tree] (and (vector? tree) (every? vector? tree)))
 
-(defn control-give-chance [state] (assoc state :chance-used false))
+(defn control-give-chance [state] (assoc state :chance-used? false))
 
 (defn put-newline [state]
   (update-in
@@ -121,7 +121,7 @@
 
 (defn write-in-between-node [tree state]
   (if (string? tree)
-    (if (:is-inline state)
+    (if (:inline? state)
       (->> state (put-space) (write-token tree))
       (->> state
            (put-newline)
@@ -146,7 +146,7 @@
               state
               tree)
              (control-after-vector true))
-      (and (not (:chance-used state))
+      (and (not (:chance-used? state))
            (not (:after-vector? state))
            (is-simple-expression tree))
         (->> state
@@ -166,8 +166,8 @@
 (def initial-state
   {:code "",
    :indentations 0,
-   :is-inline false,
-   :chance-used false,
+   :inline? false,
+   :chance-used? false,
    :dollar-ok? true,
    :after-vector? false})
 

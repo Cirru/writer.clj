@@ -51,17 +51,25 @@
 
 (defn control-dollar [new-value state] (assoc state :dollar-ok? new-value))
 
-(defn nested? [tree] (and (vector? tree) (every? vector? tree)))
+(defn nested? [tree]
+  (and (vector? tree)
+       (not (empty? tree))
+       (every? #(and (vector? %) (string? (first %))) tree)))
 
 (defn control-give-chance [state] (assoc state :chance-used? false))
 
 (defn put-newline [state]
-  (update-in
+  (update
    state
-   [:code]
+   :code
    (fn [code] (str code "\n" (string/join "" (repeat (* 2 (:indentations state)) " "))))))
 
 (defn control-indent [state] (update-in state [:indentations] inc))
+
+(defn control-unindent [state] (update-in state [:indentations] dec))
+
+(defn wrap-unindent [then-call state]
+  (->> state (control-unindent) (then-call) (control-indent)))
 
 (defn put-comma [state] (write-raw "," state))
 
@@ -69,7 +77,8 @@
 
 (defn write-first-node [tree state] (write-inline-node tree state))
 
-(defn control-unindent [state] (update-in state [:indentations] dec))
+(defn wrap-indent [then-call state]
+  (->> state (control-indent) (then-call) (control-unindent)))
 
 (defn control-after-vector [new-value state] (assoc state :after-vector? new-value))
 
@@ -82,15 +91,16 @@
       (if (> (count tree) 0)
         (->> state
              (put-space)
-             (control-unindent)
-             (put-dollar)
-             (put-space)
-             (control-dollar false)
-             (control-inline)
-             (control-give-chance)
-             (write-block tree)
-             (control-outline)
-             (control-indent))
+             (wrap-unindent
+              (fn [inner-state]
+                (->> inner-state
+                     (put-dollar)
+                     (put-space)
+                     (control-dollar false)
+                     (control-inline)
+                     (control-give-chance)
+                     (write-block tree)
+                     (control-outline)))))
         (->> state (put-space) (write-raw "()"))))
     (->> state (control-dollar true) (write-in-between-node tree))))
 
@@ -98,25 +108,22 @@
   (case (count tree)
     0 (throw (js/Error. "nothing to write as a line"))
     1 (write-first-node (first tree) state)
-    (let [head (first tree)
-          between (rest (butlast tree))
-          tail (last tree)
-          body-handler (fn [next-state]
-                         (reduce
-                          (fn [acc branch]
-                            (->> acc
-                                 (control-dollar (:dollar-ok? next-state))
-                                 (write-in-between-node branch)))
-                          next-state
-                          between))]
+    (let [head (first tree), between (rest (butlast tree)), tail (last tree)]
       (->> state
            (write-first-node head)
            (control-inline)
            (control-after-vector false)
-           (control-indent)
-           (body-handler)
-           (write-last-node tail)
-           (control-unindent)
+           (wrap-indent
+            (fn [inner-state]
+              (as->
+               inner-state
+               ss
+               (reduce
+                (fn [acc branch]
+                  (->> acc (control-dollar (:dollar-ok? ss)) (write-in-between-node branch)))
+                ss
+                between)
+               (write-last-node tail ss))))
            (control-outline)))))
 
 (defn write-in-between-node [tree state]
@@ -125,27 +132,13 @@
       (->> state (put-space) (write-token tree))
       (->> state
            (put-newline)
-           (put-comma)
            (control-inline)
+           (put-comma)
            (control-give-chance)
            (put-space)
            (write-token tree)
            (control-after-vector true)))
     (cond
-      (nested? tree)
-        (->> (reduce
-              (fn [acc branch]
-                (->> acc
-                     (control-indent)
-                     (put-newline)
-                     (control-inline)
-                     (control-after-vector false)
-                     (write-block branch)
-                     (control-unindent)
-                     (control-outline)))
-              state
-              tree)
-             (control-after-vector true))
       (and (not (:chance-used? state))
            (not (:after-vector? state))
            (is-simple-expression tree))

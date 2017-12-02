@@ -97,6 +97,6 @@
     (write (read-string (slurp "examples/ast/unfolding.edn")))
     (slurp "examples/cirru/unfolding.cirru")))))
 
-(defn main! [] (double-nesting-test))
+(defn main! [] (run-tests))
 
 (defn reload! [] (main!))

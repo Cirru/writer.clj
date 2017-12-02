@@ -1,26 +1,37 @@
 
 (ns cirru-writer.main
-  (:require [tiny-app.core :refer [create-app->]]
-            [cirru-writer.comp.container :refer [comp-container]]))
+  (:require [respo.core :refer [render! clear-cache! realize-ssr!]]
+            [cirru-writer.comp.container :refer [comp-container]]
+            [cirru-writer.updater :refer [updater]]
+            [cirru-writer.schema :as schema]
+            [reel.util :refer [id!]]
+            [reel.core :refer [reel-updater refresh-reel listen-devtools!]]
+            [reel.schema :as reel-schema]))
 
-(defn main! [] )
+(defonce *reel
+  (atom (-> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store))))
 
-(def store {:states {}, :content ""})
+(defn dispatch! [op op-data]
+  (let [op-id (id!), next-reel (reel-updater updater @*reel op op-data op-id)]
+    (reset! *reel next-reel)))
 
-(defn updater [store op op-data]
-  (case op
-    :content (assoc store :content op-data)
-    (do (.warn js/console "Unknown op:" (pr-str op)) store)))
+(def mount-target (.querySelector js/document ".app"))
 
-(def app
-  (create-app->
-   {:model store,
-    :updater updater,
-    :mount-target (.querySelector js/document ".app"),
-    :view comp-container,
-    :ssr? false,
-    :show-ops? false}))
+(defn render-app! [renderer]
+  (renderer mount-target (comp-container @*reel) #(dispatch! %1 %2)))
 
-(def reload! (:reload! app))
+(def ssr? (some? (js/document.querySelector "meta.respo-ssr")))
 
-(set! (.-onload js/window) (:start-app! app))
+(defn main! []
+  (if ssr? (render-app! realize-ssr!))
+  (render-app! render!)
+  (add-watch *reel :changes (fn [] (render-app! render!)))
+  (listen-devtools! "a" dispatch!)
+  (println "App started."))
+
+(defn reload! []
+  (clear-cache!)
+  (reset! *reel (refresh-reel @*reel schema/store updater))
+  (println "Code updated."))
+
+(set! (.-onload js/window) main!)

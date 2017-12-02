@@ -7,7 +7,18 @@
     "example": "examples"
   },
   "scripts": {
-    "watch": "shadow-cljs watch app",
+    "cdn": "rsync -avr --progress dist/* tiye.me:cdn/writer.clj",
+    "tiye": "rsync -avr --progress dist/{index.html,manifest.json} tiye.me:repo/Cirru/writer.clj/",
+    "upload": "yarn cdn && yarn tiye",
+    "release": "shadow-cljs release browser",
+    "watch": "shadow-cljs watch browser",
+    "compile-ssr": "shadow-cljs compile ssr",
+    "html-dev": "env=dev node target/ssr.js && cp entry/manifest.json target/",
+    "html": "node target/ssr.js && cp entry/manifest.json dist/",
+    "index.html": "yarn compile-ssr && yarn html-dev",
+    "del": "rm -rf dist/*",
+    "serve": "http-server dist -s",
+    "build": "yarn del && yarn release && yarn compile-ssr && yarn html",
     "watch-test": "shadow-cljs watch test",
     "compile-test": "shadow-cljs compile test",
     "test": "yarn compile-test && node target/test.js"
@@ -24,6 +35,7 @@
   "homepage": "https://github.com/Cirru/writer.clj#readme",
   "dependencies": {},
   "devDependencies": {
-    "shadow-cljs": "^2.0.112"
+    "http-server": "^0.10.0",
+    "shadow-cljs": "^2.0.114"
   }
 }

@@ -8,14 +8,14 @@ Demo http://repo.cirru.org/writer.clj/
 
 ### API Usage
 
-[![Clojars Project](http://clojars.org/cirru/writer/latest-version.svg)](http://clojars.org/cirru/writer)
+[![Clojars Project](https://img.shields.io/clojars/v/cirru/writer.svg)](https://clojars.org/cirru/writer)
 
 ```clojure
-[cirru/writer "0.1.1"]
+[cirru/writer "0.1.2"]
 ```
 
 ```clojure
-(cirru-writer.core/write [["define"
+(cirru-writer.core/write-code [["define"
   "a"
   ["read" "cd"]
   ["if" [">" "a" "cd"] ["print" "demo"] ["print" "not demo"]]]

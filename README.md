@@ -9,7 +9,7 @@ Cirru Writer in Clojure
 [![Clojars Project](http://clojars.org/cirru/writer/latest-version.svg)](http://clojars.org/cirru/writer)
 
 ```clojure
-[cirru/writer "0.1.0"]
+[cirru/writer "0.1.1"]
 ```
 
 ```clojure

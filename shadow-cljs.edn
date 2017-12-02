@@ -1,7 +1,17 @@
 
 {:source-paths ["src"]
- :dependencies []
+ :dependencies [[respo          "0.8.0"]
+                [respo/tiny-app "0.2.2"]
+                [mvc-works/hsl  "0.1.2"]
+                [respo/ui       "0.2.0"]]
  :builds {:test {:target :node-script
                  :output-to "target/test.js"
                  :main cirru-writer.test/main!
-                 :devtools {:after-load cirru-writer.test/reload!}}}}
+                 :devtools {:after-load cirru-writer.test/reload!}}
+          :app {:target :browser
+                :output-dir "target/"
+                :asset-path "."
+                :modules {:main {:entries [cirru-writer.main]}}
+                :devtools {:after-load cirru-writer.main/reload!
+                           :http-root "target"
+                           :http-port 8080}}}}

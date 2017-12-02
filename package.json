@@ -7,8 +7,10 @@
     "example": "examples"
   },
   "scripts": {
-    "watch": "shadow-cljs watch test",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "shadow-cljs watch app",
+    "watch-test": "shadow-cljs watch test",
+    "compile-test": "shadow-cljs compile test",
+    "test": "yarn compile-test && node target/test.js"
   },
   "repository": {
     "type": "git",

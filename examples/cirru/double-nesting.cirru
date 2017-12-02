@@ -1,4 +1,6 @@
 
 a
-  (b c) $ d
-  (d e) $ f
+    b c
+    d
+  (d e)
+    f

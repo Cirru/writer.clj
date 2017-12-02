@@ -1,11 +1,16 @@
 
-(ns cirru-writer.core (:require [clojure.string :as string]))
+(ns cirru-writer.core
+  (:require [clojure.string :as string]
+            [cirru-writer.list :refer [transform-dollar transform-comma]]))
 
 (defn boxed? [expr] (every? vector? expr))
 
 (defn simple? [expr] (and (vector? expr) (every? string? expr)))
 
-(defn generate-leaf [leaf] leaf)
+(defn generate-leaf [leaf]
+  (if (re-matches (re-pattern "[a-zA-Z0-9\\-><\\$\\(\\)\\!\\?^*=\\+\\|\\\\\\,]+") leaf)
+    leaf
+    (pr-str leaf)))
 
 (defn generate-inline-expr [expr]
   [:open
@@ -42,7 +47,12 @@
                             [:indent :newline (generate-tree cursor false) :unindent])
                         :expr [:indent :newline (generate-tree cursor false) :unindent]
                         :boxed-expr
-                          [:indent (generate-tree cursor (= prev-kind :boxed-expr)) :unindent]
+                          [:indent
+                           (if (contains? #{:leaf :simple-expr nil} prev-kind)
+                             :nothing
+                             :newline)
+                           (generate-tree cursor (= prev-kind :boxed-expr))
+                           :unindent]
                         nil)))
             result (if (or (and (= prev-kind :leaf) (contains? #{:leaf :simple-expr} kind))
                            (and (contains? #{:leaf :simple-expr} prev-kind) (= kind :leaf)))
@@ -62,6 +72,7 @@
             piece (cond
                     (string? op) op
                     (= op :newline) (str "\n" (render-spaces level))
+                    (= op :nothing) ""
                     (= op :open) "("
                     (= op :close) ")"
                     (= op :space) " "
@@ -72,6 +83,8 @@
         (recur (str acc piece) (rest ops) next-level)))))
 
 (defn generate-statements [exprs]
-  (mapv (fn [xs] [:newline (generate-tree xs true) :newline]) exprs))
+  (mapv
+   (fn [xs] [:newline (generate-tree xs true) :newline])
+   (transform-dollar (transform-comma exprs))))
 
 (defn write-code [exprs] (emit-string (generate-statements exprs)))

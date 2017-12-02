@@ -1,8 +1,8 @@
 
-if
-  and false $ some? memory
+if (and false $ some? memory)
   , memory
   let
-    (factory (render-method props state)) $ result (factory default-intent)
+      factory $ render-method props state
+      result $ factory default-intent
     swap! memorization assoc component result
     , result

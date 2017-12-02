@@ -3,6 +3,7 @@
  :dependencies [[respo          "0.8.0"]
                 [respo/tiny-app "0.2.2"]
                 [mvc-works/hsl  "0.1.2"]
+                [cirru/parser   "0.1.0"]
                 [respo/ui       "0.2.0"]]
  :builds {:test {:target :node-script
                  :output-to "target/test.js"

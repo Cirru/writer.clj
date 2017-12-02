@@ -5,7 +5,6 @@ define a (read cd)
     print "not demo"
 
 say $ print a
-  save $ b
-    x $ c 8
+  save $ b (x $ c 8)
 
 print fun

@@ -5,12 +5,14 @@
 
 (defn boxed? [expr] (every? vector? expr))
 
+(def allowed-chars "-_@#$%!?^*=+|\\/<>()[]{}.,:;'")
+
 (defn simple? [expr] (and (vector? expr) (every? string? expr)))
 
-(defn generate-leaf [leaf]
-  (if (re-matches (re-pattern "[a-zA-Z0-9\\-><\\$\\(\\)\\!\\?^*=\\+\\|\\\\\\,]+") leaf)
-    leaf
-    (pr-str leaf)))
+(defn char-allowed? [x]
+  (or (re-matches (re-pattern "[a-zA-Z0-9]") x) (string/includes? allowed-chars x)))
+
+(defn generate-leaf [leaf] (if (every? char-allowed? leaf) leaf (pr-str leaf)))
 
 (defn generate-inline-expr [expr]
   [:open

@@ -49,7 +49,6 @@
      (textarea
       {:style (merge ui/textarea style-input-content),
        :value (:content store),
-       :placeholder (:content store),
        :on {:input (fn [e d! m!] (d! :content (:value e)))}})
      (=< 8 nil)
      (div

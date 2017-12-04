@@ -8,7 +8,7 @@
                 [mvc-works/keycode      "0.1.3"]
                 [cirru/parser           "0.1.0"]
                 [respo/value            "0.2.3"]
-                [respo                  "0.8.0"]]
+                [respo                  "0.8.1"]]
  :open-file-command ["subl" ["%s:%s:%s" :file :line :column]]
  :builds {:browser {:target :browser
                     :output-dir "target/browser"

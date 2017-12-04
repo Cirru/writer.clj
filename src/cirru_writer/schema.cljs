@@ -1,9 +1,10 @@
 
-(ns cirru-writer.schema )
+(ns cirru-writer.schema
+  (:require [cljs.reader :refer [read-string]]
+            [cirru-writer.core :refer [generate-statements emit-string]]))
 
 (def store
-  {:states {},
-   :content "[[\"a\" \"b\"]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"] \"c\"]\n [\"a\" [[\"b\"] [\"c\"]] [\"d\" [\"e\"]]]]\n",
-   :ops [],
-   :result "",
-   :error nil})
+  (let [content "[[\"a\" \"b\"]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"] \"c\"]\n [\"a\" [[\"b\"] [\"c\"]] [\"d\" [\"e\"]]]]\n"
+        ops (generate-statements (read-string content))
+        result (emit-string ops)]
+    {:states {}, :content content, :ops ops, :result result, :error nil}))

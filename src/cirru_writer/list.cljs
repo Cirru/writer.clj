@@ -1,6 +1,22 @@
 
 (ns cirru-writer.list )
 
+(defn transform-comma [xs]
+  (loop [acc [], chunk [], nodes xs, prev-kind nil]
+    (if (empty? nodes)
+      (if (empty? chunk) acc (conj acc (into [] (concat [","] chunk))))
+      (let [cursor (first nodes), kind (if (string? cursor) :leaf :expr)]
+        (if (and (= kind :leaf) (= prev-kind :expr))
+          (recur acc (conj chunk cursor) (rest nodes) kind)
+          (let [checked-acc (if (empty? chunk)
+                              acc
+                              (conj acc (into [] (concat [","] chunk))))]
+            (recur
+             (conj checked-acc (if (string? cursor) cursor (transform-comma cursor)))
+             []
+             (rest nodes)
+             kind)))))))
+
 (defn transform-dollar
   ([xs] (transform-dollar xs false))
   ([xs at-dollar?]
@@ -25,19 +41,3 @@
               (rest nodes)
               kind
               false))))))))
-
-(defn transform-comma [xs]
-  (loop [acc [], chunk [], nodes xs, prev-kind nil]
-    (if (empty? nodes)
-      (if (empty? chunk) acc (conj acc (into [] (concat [","] chunk))))
-      (let [cursor (first nodes), kind (if (string? cursor) :leaf :expr)]
-        (if (and (= kind :leaf) (= prev-kind :expr))
-          (recur acc (conj chunk cursor) (rest nodes) kind)
-          (let [checked-acc (if (empty? chunk)
-                              acc
-                              (conj acc (into [] (concat [","] chunk))))]
-            (recur
-             (conj checked-acc (if (string? cursor) cursor (transform-comma cursor)))
-             []
-             (rest nodes)
-             kind)))))))

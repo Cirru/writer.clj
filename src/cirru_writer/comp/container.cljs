@@ -7,6 +7,13 @@
             [cljs.reader :refer [read-string]]
             [cirru-writer.core :refer [emit-string generate-statements]]))
 
+(defn on-click [content]
+  (fn [e d! m!]
+    (try
+     (let [ops (generate-statements (read-string content)), result (emit-string ops)]
+       (d! :generate {:ops ops, :result result}))
+     (catch js/Error. error (d! :error error)))))
+
 (def style-code
   {:font-family "Menlo,monospace",
    :background-color (hsl 0 0 94),
@@ -16,13 +23,6 @@
    :overflow :auto,
    :white-space :pre-line,
    :line-height 1.8})
-
-(defn on-click [content]
-  (fn [e d! m!]
-    (try
-     (let [ops (generate-statements (read-string content)), result (emit-string ops)]
-       (d! :generate {:ops ops, :result result}))
-     (catch js/Error. error (d! :error error)))))
 
 (def style-input-content
   {:width 400, :flex-shrink 0, :height 600, :font-family "Menlo,monospace"})

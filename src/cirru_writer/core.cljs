@@ -3,14 +3,34 @@
   (:require [clojure.string :as string]
             [cirru-writer.list :refer [transform-dollar transform-comma]]))
 
-(defn boxed? [expr] (every? vector? expr))
-
 (def allowed-chars "-_@#$%!?^*=+|\\/<>()[]{}.,:;'")
 
-(defn simple? [expr] (and (vector? expr) (every? string? expr)))
+(defn boxed? [expr] (every? vector? expr))
 
 (defn char-allowed? [x]
   (or (re-matches (re-pattern "[a-zA-Z0-9]") x) (string/includes? allowed-chars x)))
+
+(defn render-spaces
+  ([n] (render-spaces "" n))
+  ([acc n] (if (zero? n) acc (recur (str acc "  ") (dec n)))))
+
+(defn emit-string [operations]
+  (loop [acc "", ops (flatten operations), level 0]
+    (if (empty? ops)
+      acc
+      (let [op (first ops)
+            piece (cond
+                    (string? op) op
+                    (= op :newline) (str "\n" (render-spaces level))
+                    (= op :nothing) ""
+                    (= op :open) "("
+                    (= op :close) ")"
+                    (= op :space) " "
+                    (= op :indent) ""
+                    (= op :unindent) ""
+                    :else {:type :unknown, :data op})
+            next-level (case op :indent (inc level) :unindent (dec level) level)]
+        (recur (str acc piece) (rest ops) next-level)))))
 
 (defn generate-leaf [leaf] (if (every? char-allowed? leaf) leaf (pr-str leaf)))
 
@@ -27,6 +47,8 @@
              next-result (if (empty? result) next-child [result next-child])]
          (recur next-result (rest nodes) false))))
    :close])
+
+(defn simple? [expr] (and (vector? expr) (every? string? expr)))
 
 (defn generate-tree [expr insist-head?]
   (loop [acc [], exprs expr, head? true, prev-kind nil]
@@ -61,28 +83,6 @@
                      [:space child]
                      child)]
         (recur (if (empty? acc) result [acc result]) (rest exprs) false kind)))))
-
-(defn render-spaces
-  ([n] (render-spaces "" n))
-  ([acc n] (if (zero? n) acc (recur (str acc "  ") (dec n)))))
-
-(defn emit-string [operations]
-  (loop [acc "", ops (flatten operations), level 0]
-    (if (empty? ops)
-      acc
-      (let [op (first ops)
-            piece (cond
-                    (string? op) op
-                    (= op :newline) (str "\n" (render-spaces level))
-                    (= op :nothing) ""
-                    (= op :open) "("
-                    (= op :close) ")"
-                    (= op :space) " "
-                    (= op :indent) ""
-                    (= op :unindent) ""
-                    :else {:type :unknown, :data op})
-            next-level (case op :indent (inc level) :unindent (dec level) level)]
-        (recur (str acc piece) (rest ops) next-level)))))
 
 (defn generate-statements [exprs]
   (mapv

@@ -4,16 +4,17 @@
             [cirru-writer.comp.container :refer [comp-container]]
             [cirru-writer.updater :refer [updater]]
             [cirru-writer.schema :as schema]
-            [reel.util :refer [id!]]
-            [reel.core :refer [reel-updater refresh-reel listen-devtools!]]
-            [reel.schema :as reel-schema]))
+            [reel.core :refer [reel-updater refresh-reel]]
+            [reel.util :refer [listen-devtools!]]
+            [reel.schema :as reel-schema]
+            [cirru-writer.config :as config]))
 
 (defonce *reel
   (atom (-> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store))))
 
 (defn dispatch! [op op-data]
-  (let [op-id (id!), next-reel (reel-updater updater @*reel op op-data op-id)]
-    (reset! *reel next-reel)))
+  (when config/dev? (println "Dispatch:" op))
+  (reset! *reel (reel-updater updater @*reel op op-data)))
 
 (def mount-target (.querySelector js/document ".app"))
 
@@ -33,5 +34,3 @@
   (clear-cache!)
   (reset! *reel (refresh-reel @*reel schema/store updater))
   (println "Code updated."))
-
-(set! (.-onload js/window) main!)

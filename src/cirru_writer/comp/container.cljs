@@ -1,7 +1,7 @@
 
 (ns cirru-writer.comp.container
-  (:require [respo.macros :refer [defcomp div <> textarea button pre a]]
-            [respo-ui.style :as ui]
+  (:require [respo.core :refer [defcomp div <> textarea button pre a]]
+            [respo-ui.core :as ui]
             [hsl.core :refer [hsl]]
             [respo.comp.space :refer [=<]]
             [cljs.reader :refer [read-string]]

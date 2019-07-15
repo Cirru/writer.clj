@@ -7,18 +7,13 @@
     "example": "examples"
   },
   "scripts": {
-    "cdn": "rsync -avr --progress dist/* tiye.me:cdn/writer.clj",
-    "tiye": "rsync -avr --progress dist/{index.html,manifest.json} tiye.me:repo/Cirru/writer.clj/",
-    "upload": "yarn cdn && yarn tiye",
-    "release": "shadow-cljs release browser",
-    "watch": "shadow-cljs watch browser",
-    "compile-ssr": "shadow-cljs compile ssr",
-    "html-dev": "env=dev node target/ssr.js && cp entry/manifest.json target/",
-    "html": "node target/ssr.js && cp entry/manifest.json dist/",
-    "index.html": "yarn compile-ssr && yarn html-dev",
-    "del": "rm -rf dist/*",
+    "watch": "shadow-cljs watch client",
     "serve": "http-server dist -s",
-    "build": "yarn del && yarn release && yarn compile-ssr && yarn html",
+    "build-cdn": "shadow-cljs clj-run build.main/build-cdn",
+    "build": "shadow-cljs clj-run build.main/build",
+    "up": "yarn build-cdn && tiye-up",
+    "page": "shadow-cljs clj-run build.main/page",
+    "ln": "cd target && rm -f entry && ln -s ../entry",
     "watch-test": "shadow-cljs watch test",
     "compile-test": "shadow-cljs compile test",
     "test": "yarn compile-test && node target/test.js"
@@ -33,9 +28,11 @@
     "url": "https://github.com/Cirru/writer.clj/issues"
   },
   "homepage": "https://github.com/Cirru/writer.clj#readme",
-  "dependencies": {},
+  "dependencies": {
+    "shortid": "^2.2.14"
+  },
   "devDependencies": {
-    "http-server": "^0.10.0",
-    "shadow-cljs": "^2.0.127"
+    "http-server": "^0.11.1",
+    "shadow-cljs": "^2.8.40"
   }
 }

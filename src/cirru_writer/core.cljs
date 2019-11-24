@@ -50,7 +50,7 @@
 
 (defn simple? [expr] (and (vector? expr) (every? string? expr)))
 
-(defn generate-tree [expr insist-head?]
+(defn generate-tree [expr insist-head? options]
   (loop [acc [], exprs expr, head? true, prev-kind nil]
     (if (empty? exprs)
       acc
@@ -66,9 +66,11 @@
                       (generate-inline-expr cursor)
                       (case kind
                         :simple-expr
-                          (if (= prev-kind :leaf)
-                            (generate-inline-expr cursor)
-                            [:indent :newline (generate-tree cursor false) :unindent])
+                          (cond
+                            (= prev-kind :leaf) (generate-inline-expr cursor)
+                            (and (:inline? options) (= prev-kind :simple-expr))
+                              [:space (generate-inline-expr cursor)]
+                            :else [:indent :newline (generate-tree cursor false) :unindent])
                         :expr [:indent :newline (generate-tree cursor false) :unindent]
                         :boxed-expr
                           [:indent
@@ -83,9 +85,11 @@
                      child)]
         (recur (if (empty? acc) result [acc result]) (rest exprs) false kind)))))
 
-(defn generate-statements [exprs]
+(defn generate-statements [exprs options]
   (mapv
-   (fn [xs] [:newline (generate-tree xs true) :newline])
+   (fn [xs] [:newline (generate-tree xs true options) :newline])
    (transform-dollar (transform-comma exprs))))
 
-(defn write-code [exprs] (emit-string (generate-statements exprs)))
+(defn write-code
+  ([exprs] (write-code exprs {:inline? false}))
+  ([exprs options] (emit-string (generate-statements exprs options))))

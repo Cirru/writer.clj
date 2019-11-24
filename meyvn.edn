@@ -1,7 +1,7 @@
 
 {:pom {:group-id "cirru",
        :artifact-id "writer",
-       :version "0.1.4-a1",
+       :version "0.1.4-a2",
        :name "Cirru Writer"}
  :packaging {:jar {:enabled true
                    :remote-repository {:id "clojars"

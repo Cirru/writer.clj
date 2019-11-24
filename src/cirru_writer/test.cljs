@@ -9,6 +9,15 @@
 (defn slurp [x] (fs/readFileSync x "utf8"))
 
 (deftest
+ demo-inline-mode
+ (let [data (read-string (slurp "examples/ast/inline-mode.edn"))
+       expected (slurp "examples/cirru/inline-mode.cirru")]
+   (testing
+    "writing case for inline-mode"
+    (is (= (pare expected nil) data))
+    (is (= (write-code data {:inline? true}) expected)))))
+
+(deftest
  demo-test
  (let [data (read-string (slurp "examples/ast/demo.edn"))
        expected (slurp "examples/cirru/demo.cirru")]

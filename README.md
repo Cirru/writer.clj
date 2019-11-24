@@ -38,6 +38,18 @@ say $ print a
 print fun
 ```
 
+Added a inline mode:
+
+```clojure
+(write-code [["a" ["b" "c"] ["d" "e"] ["g" "h"]]])
+```
+
+which generates simple expressions as inline node:
+
+```cirru
+a (c b) (d e) (g h)
+```
+
 ### Develop
 
 Test:

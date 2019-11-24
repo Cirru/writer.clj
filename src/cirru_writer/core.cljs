@@ -70,14 +70,19 @@
                             (= prev-kind :leaf) (generate-inline-expr cursor)
                             (and (:inline? options) (= prev-kind :simple-expr))
                               [:space (generate-inline-expr cursor)]
-                            :else [:indent :newline (generate-tree cursor false) :unindent])
-                        :expr [:indent :newline (generate-tree cursor false) :unindent]
+                            :else
+                              [:indent
+                               :newline
+                               (generate-tree cursor false options)
+                               :unindent])
+                        :expr
+                          [:indent :newline (generate-tree cursor false options) :unindent]
                         :boxed-expr
                           [:indent
                            (if (contains? #{:leaf :simple-expr nil} prev-kind)
                              :nothing
                              :newline)
-                           (generate-tree cursor (= prev-kind :boxed-expr))
+                           (generate-tree cursor (= prev-kind :boxed-expr) options)
                            :unindent])))
             result (if (or (and (= prev-kind :leaf) (contains? #{:leaf :simple-expr} kind))
                            (and (contains? #{:leaf :simple-expr} prev-kind) (= kind :leaf)))

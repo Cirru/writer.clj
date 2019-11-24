@@ -10,7 +10,7 @@
 (defn on-click [content]
   (fn [e d! m!]
     (try
-     (let [ops (generate-statements (read-string content) {:inline? false})
+     (let [ops (generate-statements (read-string content) {:inline? true})
            result (emit-string ops)]
        (d! :generate {:ops ops, :result result}))
      (catch js/Error. error (d! :error error)))))

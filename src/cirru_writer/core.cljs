@@ -3,7 +3,7 @@
   (:require [clojure.string :as string]
             [cirru-writer.list :refer [transform-dollar transform-comma]]))
 
-(def allowed-chars "-_@#$%!?^*=+|\\/<>()[]{}.,:;'")
+(def allowed-chars "-_@#$%!?^*=+|\\/<>[]{}.,:;'")
 
 (defn boxed? [expr] (every? vector? expr))
 
@@ -76,8 +76,7 @@
                              :nothing
                              :newline)
                            (generate-tree cursor (= prev-kind :boxed-expr))
-                           :unindent]
-                        nil)))
+                           :unindent])))
             result (if (or (and (= prev-kind :leaf) (contains? #{:leaf :simple-expr} kind))
                            (and (contains? #{:leaf :simple-expr} prev-kind) (= kind :leaf)))
                      [:space child]

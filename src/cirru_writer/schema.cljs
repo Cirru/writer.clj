@@ -5,6 +5,6 @@
 
 (def store
   (let [content "[[\"a\" \"b\"]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"] \"c\"]\n [\"a\" [[\"b\"] [\"c\"]] [\"d\" [\"e\"]]]]\n"
-        ops (generate-statements (read-string content))
+        ops (generate-statements (read-string content) {:inline? false})
         result (emit-string ops)]
     {:states {}, :content content, :ops ops, :result result, :error nil}))

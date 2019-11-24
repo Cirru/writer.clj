@@ -668,7 +668,7 @@
                       :type :expr, :by "Sk6m_HRlG", :at 1574575890800, :id "704sv5WHs4"
                       :data {
                        "T" {:type :leaf, :by "Sk6m_HRlG", :at 1574575894034, :text ":inline?", :id "5B1PJcGMy"}
-                       "j" {:type :leaf, :by "Sk6m_HRlG", :at 1574575895989, :text "false", :id "tgr6gX7QAI"}
+                       "j" {:type :leaf, :by "Sk6m_HRlG", :at 1574576898209, :text "true", :id "tgr6gX7QAI"}
                       }
                      }
                     }
@@ -2069,6 +2069,7 @@
                                  "T" {:type :leaf, :text "generate-tree", :id "rkEIJRelZf", :by "root", :at 1512210102053}
                                  "j" {:type :leaf, :text "cursor", :id "BJblAexWz", :by "root", :at 1512209898021}
                                  "r" {:type :leaf, :text "false", :id "SkFiUWxZz", :by "root", :at 1512212129819}
+                                 "v" {:type :leaf, :by "Sk6m_HRlG", :at 1574577102669, :text "options", :id "pkkfiThXZF"}
                                 }
                                }
                                "j" {:type :leaf, :text ":unindent", :id "SJIpCgx-M", :by "root", :at 1512210111781}
@@ -2096,6 +2097,7 @@
                              "T" {:type :leaf, :text "generate-tree", :id "rkEIJRelZf", :by "root", :at 1512210102053}
                              "j" {:type :leaf, :text "cursor", :id "BJblAexWz", :by "root", :at 1512209898021}
                              "r" {:type :leaf, :text "false", :id "rkx0dS-lWz", :by "root", :at 1512211831199}
+                             "v" {:type :leaf, :by "Sk6m_HRlG", :at 1574577081449, :text "options", :id "QxudKLXlxh"}
                             }
                            }
                            "j" {:type :leaf, :text ":unindent", :id "SJIpCgx-M", :by "root", :at 1512210111781}
@@ -2149,6 +2151,7 @@
                                "r" {:type :leaf, :text ":boxed-expr", :id "SktMr-l-f", :by "root", :at 1512211734460}
                               }
                              }
+                             "v" {:type :leaf, :by "Sk6m_HRlG", :at 1574577095156, :text "options", :id "tBqgA7mFw"}
                             }
                            }
                            "x" {:type :leaf, :text ":unindent", :id "S1x1uQ-ebG", :by "root", :at 1512211304999}

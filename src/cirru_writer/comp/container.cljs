@@ -5,14 +5,15 @@
             [hsl.core :refer [hsl]]
             [respo.comp.space :refer [=<]]
             [cljs.reader :refer [read-string]]
-            [cirru-writer.core :refer [emit-string generate-statements]]))
+            [cirru-writer.core :refer [generate-statements]]))
 
 (defn on-click [content]
   (fn [e d! m!]
     (try
-     (let [ops (generate-statements (read-string content) {:inline? true})
-           result (emit-string ops)]
-       (d! :generate {:ops ops, :result result}))
+     (let [started-time (.now js/Date)
+           result (generate-statements (read-string content) {:inline? true})]
+       (println "Cost" (- (.now js/Date) started-time))
+       (d! :generate {:result result}))
      (catch js/Error. error (d! :error error)))))
 
 (def style-code
@@ -52,8 +53,4 @@
        :value (:content store),
        :on {:input (fn [e d! m!] (d! :content (:value e)))}})
      (=< 8 nil)
-     (div
-      {:style ui/flex}
-      (pre {:style style-code} (<> (:ops store)))
-      (=< nil 8)
-      (pre {:style (merge style-code {:white-space :pre})} (<> (:result store))))))))
+     (div {} (pre {:style (merge style-code {:white-space :pre})} (<> (:result store))))))))

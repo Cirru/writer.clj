@@ -11,7 +11,7 @@ Demo http://repo.cirru.org/writer.clj/
 [![Clojars Project](https://img.shields.io/clojars/v/cirru/writer.svg)](https://clojars.org/cirru/writer)
 
 ```clojure
-[cirru/writer "0.1.3"]
+[cirru/writer "0.1.4"]
 ```
 
 ```clojure
@@ -41,7 +41,7 @@ print fun
 Added a inline mode:
 
 ```clojure
-(write-code [["a" ["b" "c"] ["d" "e"] ["g" "h"]]])
+(write-code [["a" ["b" "c"] ["d" "e"] ["g" "h"]]] {:inline? true})
 ```
 
 which generates simple expressions as inline node:

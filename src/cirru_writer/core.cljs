@@ -7,8 +7,11 @@
 
 (defn boxed? [expr] (every? vector? expr))
 
-(defn char-allowed? [x]
-  (or (re-matches (re-pattern "[a-zA-Z0-9]") x) (string/includes? allowed-chars x)))
+(def re-simple-chars (re-pattern "[a-zA-Z0-9]"))
+
+(def special-charset (set (string/split allowed-chars "")))
+
+(defn char-allowed? [x] (or (re-matches re-simple-chars x) (contains? special-charset  x)))
 
 (def char-close ")")
 

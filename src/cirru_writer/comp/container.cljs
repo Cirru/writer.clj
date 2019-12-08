@@ -7,27 +7,13 @@
             [cljs.reader :refer [read-string]]
             [cirru-writer.core :refer [generate-statements]]))
 
-(defn on-click [content]
-  (fn [e d! m!]
-    (try
-     (let [started-time (.now js/Date)
-           result (generate-statements (read-string content) {:inline? true})]
-       (println "Cost" (- (.now js/Date) started-time))
-       (d! :generate {:result result}))
-     (catch js/Error. error (d! :error error)))))
-
-(def style-code
-  {:font-family "Menlo,monospace",
-   :background-color (hsl 0 0 94),
-   :padding 8,
-   :margin 0,
-   :font-size 12,
-   :overflow :auto,
-   :white-space :pre-line,
-   :line-height 1.8})
-
 (def style-input-content
-  {:width 400, :flex-shrink 0, :height 600, :font-family "Menlo,monospace"})
+  {:width 400,
+   :flex-shrink 0,
+   :height 600,
+   :font-family "Menlo,monospace",
+   :white-space :pre,
+   :font-size 12})
 
 (defcomp
  comp-container
@@ -42,15 +28,31 @@
      (=< 8 nil)
      (button
       {:style (merge ui/button {:vertical-align :middle}),
-       :on {:click (on-click (:content store))}}
+       :on-click (fn [e d! m!]
+         (try
+          (let [started-time (.now js/Date)
+                result (generate-statements (read-string (:content store)) {:inline? true})]
+            (println "Cost" (- (.now js/Date) started-time))
+            (d! :generate {:result result}))
+          (catch js/Error. error (d! :error error))))}
       (<> "Generate"))
      (=< 8 nil)
      (<> (:error store) {:color :red}))
     (div
      {:style (merge ui/row {:padding "0 8px"})}
      (textarea
-      {:style (merge ui/textarea style-input-content),
+      {:style (merge ui/expand ui/textarea style-input-content),
        :value (:content store),
-       :on {:input (fn [e d! m!] (d! :content (:value e)))}})
-     (=< 8 nil)
-     (div {} (pre {:style (merge style-code {:white-space :pre})} (<> (:result store))))))))
+       :on-input (fn [e d! m!] (d! :content (:value e)))})
+     (textarea
+      {:style (merge ui/expand ui/textarea style-input-content), :value (:result store)})))))
+
+(def style-code
+  {:font-family "Menlo,monospace",
+   :background-color (hsl 0 0 94),
+   :padding 8,
+   :margin 0,
+   :font-size 12,
+   :overflow :auto,
+   :white-space :pre-line,
+   :line-height 1.8})

@@ -3,7 +3,7 @@
   (:require [cljs.test :refer [deftest run-tests is testing]]
             [cirru-writer.core :refer [write-code]]
             [cljs.reader :refer [read-string]]
-            [cirru-parser.core :refer [pare]]
+            [cirru-parser.core :refer [parse]]
             ["fs" :as fs]))
 
 (defn slurp [x] (fs/readFileSync x "utf8"))
@@ -14,7 +14,7 @@
        expected (slurp "examples/cirru/inline-mode.cirru")]
    (testing
     "writing case for inline-mode"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data {:inline? true}) expected)))))
 
 (deftest
@@ -23,7 +23,7 @@
        expected (slurp "examples/cirru/demo.cirru")]
    (testing
     "writing case for demo"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -32,7 +32,7 @@
        expected (slurp "examples/cirru/double-nesting.cirru")]
    (testing
     "writing case for double-nesting"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -41,7 +41,7 @@
        expected (slurp "examples/cirru/folding.cirru")]
    (testing
     "writing case for folding"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -50,7 +50,7 @@
        expected (slurp "examples/cirru/indent.cirru")]
    (testing
     "writing case for indent"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -59,7 +59,7 @@
        expected (slurp "examples/cirru/inline-let.cirru")]
    (testing
     "writing case for inline-let"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -68,7 +68,7 @@
        expected (slurp "examples/cirru/line.cirru")]
    (testing
     "case for line"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -77,7 +77,7 @@
        expected (slurp "examples/cirru/parentheses.cirru")]
    (testing
     "writing case for parentheses"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -86,7 +86,7 @@
        expected (slurp "examples/cirru/quote.cirru")]
    (testing
     "case for quote"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -95,7 +95,7 @@
        expected (slurp "examples/cirru/spaces.cirru")]
    (testing
     "writing case for spaces"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (deftest
@@ -104,7 +104,7 @@
        expected (slurp "examples/cirru/unfolding.cirru")]
    (testing
     "writing case for unfolding"
-    (is (= (pare expected nil) data))
+    (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
 (defn main! [] (run-tests))

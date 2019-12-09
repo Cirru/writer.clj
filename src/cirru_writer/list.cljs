@@ -1,16 +1,16 @@
 
 (ns cirru-writer.list )
 
+(defn vec-add [acc xs] (if (empty? xs) acc (recur (conj acc (first xs)) (rest xs))))
+
 (defn transform-comma [xs]
   (loop [acc [], chunk [], nodes xs, prev-kind nil]
     (if (empty? nodes)
-      (if (empty? chunk) acc (conj acc (into [] (concat [","] chunk))))
+      (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))
       (let [cursor (first nodes), kind (if (string? cursor) :leaf :expr)]
         (if (and (= kind :leaf) (= prev-kind :expr))
           (recur acc (conj chunk cursor) (rest nodes) kind)
-          (let [checked-acc (if (empty? chunk)
-                              acc
-                              (conj acc (into [] (concat [","] chunk))))]
+          (let [checked-acc (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))]
             (recur
              (conj checked-acc (if (string? cursor) cursor (transform-comma cursor)))
              []
@@ -34,7 +34,7 @@
                                  (empty? (rest nodes)))]
            (comment println "checking" cursor dollar-tail?)
            (if dollar-tail?
-             (let [next-acc (into [] (concat acc ["$"] (transform-dollar cursor true)))]
+             (let [next-acc (vec-add acc (vec-add ["$"] (transform-dollar cursor true)))]
                (recur next-acc (rest nodes) kind false))
              (recur
               (conj acc (if (= kind :leaf) cursor (transform-dollar cursor false)))

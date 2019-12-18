@@ -63,6 +63,15 @@
     (is (= (write-code data) expected)))))
 
 (deftest
+ inline-simple-test
+ (let [data (read-string (slurp "examples/ast/inline-simple.edn"))
+       expected (slurp "examples/cirru/inline-simple.cirru")]
+   (testing
+    "writing case for inline-simple"
+    (is (= (parse expected) data))
+    (is (= (write-code data {:inline? true}) expected)))))
+
+(deftest
  line-test
  (let [data (read-string (slurp "examples/ast/line.edn"))
        expected (slurp "examples/cirru/line.cirru")]

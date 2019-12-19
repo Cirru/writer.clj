@@ -17,7 +17,7 @@
 (def site
   {:dev-ui "http://localhost:8100/main-fonts.css",
    :release-ui "http://cdn.tiye.me/favored-fonts/main-fonts.css",
-   :cdn-url "http://cdn.tiye.me/writer.cj/",
+   :cdn-url "http://cdn.tiye.me/writer.clj/",
    :title "Writer",
    :icon "http://cdn.tiye.me/logo/cirru.png",
    :storage-key "writer.clj"})

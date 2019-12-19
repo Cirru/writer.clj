@@ -48,6 +48,7 @@
 
 (defn generate-tree [expr insist-head? options level]
   (loop [acc "", exprs expr, head? true, prev-kind nil]
+    (comment println "loop" (pr-str acc) exprs head? prev-kind)
     (if (empty? exprs)
       acc
       (let [cursor (first exprs)
@@ -91,10 +92,18 @@
                            (and (contains? #{:leaf :simple-expr} prev-kind) (= kind :leaf)))
                      (str char-space child)
                      child)]
-        (recur (if (empty? acc) result (str acc result)) (rest exprs) false kind)))))
+        (recur
+         (if (empty? acc) result (str acc result))
+         (rest exprs)
+         false
+         (if (and (:inline? options) (= kind :simple-expr))
+           (if (contains? #{:leaf :simple-expr} prev-kind) :simple-expr :expr)
+           kind))))))
 
 (defn generate-statements [exprs options]
-  (->> (transform-dollar (transform-comma exprs))
+  (->> exprs
+       (transform-comma)
+       (transform-dollar)
        (map (fn [xs] (str "\n" (generate-tree xs true options 0) "\n")))
        (string/join "")))
 

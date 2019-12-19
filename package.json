@@ -1,6 +1,6 @@
 {
   "name": "cirru-writer-clj",
-  "version": "0.0.4-a1",
+  "version": "0.0.4-a2",
   "description": "Cirru writer in Clojure",
   "main": "target/main.js",
   "directories": {
@@ -33,6 +33,6 @@
   },
   "devDependencies": {
     "http-server": "^0.12.0",
-    "shadow-cljs": "^2.8.81"
+    "shadow-cljs": "^2.8.83"
   }
 }

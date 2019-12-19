@@ -11,7 +11,7 @@ Demo http://repo.cirru.org/writer.clj/
 [![Clojars Project](https://img.shields.io/clojars/v/cirru/writer.svg)](https://clojars.org/cirru/writer)
 
 ```clojure
-[cirru/writer "0.1.4"]
+[cirru/writer "0.1.6"]
 ```
 
 ```clojure

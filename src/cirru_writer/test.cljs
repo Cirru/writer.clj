@@ -36,6 +36,15 @@
     (is (= (write-code data) expected)))))
 
 (deftest
+ fold-vectors-test
+ (let [data (read-string (slurp "examples/ast/fold-vectors.edn"))
+       expected (slurp "examples/cirru/fold-vectors.cirru")]
+   (testing
+    "writing case for fold-vectors"
+    (is (= (parse expected) data))
+    (is (= (write-code data {:inline? true}) expected)))))
+
+(deftest
  folding-test
  (let [data (read-string (slurp "examples/ast/folding.edn"))
        expected (slurp "examples/cirru/folding.cirru")]

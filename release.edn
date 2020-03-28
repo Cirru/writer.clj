@@ -1,0 +1,6 @@
+{:version "0.1.7-a1"
+ :group-id "cirru"
+ :artifact-id "writer"
+ :skip-tag true
+ :description "Cirru Writer"
+ :scm-url "https://github.com/Cirru/writer.clj"}

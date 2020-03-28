@@ -21,7 +21,8 @@
 
 (def char-space " ")
 
-(defn generate-leaf [leaf] (if (every? char-allowed? leaf) leaf (pr-str leaf)))
+(defn generate-leaf [leaf]
+  (if (= leaf []) "()" (if (every? char-allowed? leaf) leaf (pr-str leaf))))
 
 (defn generate-inline-expr [expr]
   (str
@@ -54,6 +55,7 @@
       (let [cursor (first exprs)
             kind (cond
                    (string? cursor) :leaf
+                   (= cursor []) :leaf
                    (simple? cursor) :simple-expr
                    (boxed? cursor) :boxed-expr
                    :else :expr)
@@ -104,7 +106,10 @@
   (->> exprs
        (transform-comma)
        (transform-dollar)
-       (map (fn [xs] (str "\n" (generate-tree xs true options 0) "\n")))
+       (map
+        (fn [xs]
+          (comment println "gen" (pr-str xs))
+          (str "\n" (generate-tree xs true options 0) "\n")))
        (string/join "")))
 
 (defn write-code

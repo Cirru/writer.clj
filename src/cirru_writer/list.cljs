@@ -7,8 +7,10 @@
   (loop [acc [], chunk [], nodes xs, prev-kind nil]
     (if (empty? nodes)
       (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))
-      (let [cursor (first nodes), kind (if (string? cursor) :leaf :expr)]
-        (if (and (= kind :leaf) (= prev-kind :expr))
+      (let [cursor (first nodes), kind (if (or (string? cursor) (= cursor [])) :leaf :expr)]
+        (comment println "loop" acc chunk nodes (pr-str cursor) kind prev-kind)
+        (if (or (and (= kind :leaf) (= prev-kind :expr))
+                (and (= kind :leaf) (not (empty? chunk))))
           (recur acc (conj chunk cursor) (rest nodes) kind)
           (let [checked-acc (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))]
             (recur

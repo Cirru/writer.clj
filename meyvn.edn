@@ -1,9 +1,0 @@
-
-{:pom {:group-id "cirru",
-       :artifact-id "writer",
-       :version "0.1.6",
-       :name "Cirru Writer"}
- :packaging {:jar {:enabled true
-                   :remote-repository {:id "clojars"
-                                       :url "https://clojars.org/repo"}}}
- :scm {:enabled true}}

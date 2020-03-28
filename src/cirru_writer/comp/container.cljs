@@ -28,7 +28,7 @@
      (=< 8 nil)
      (button
       {:style (merge ui/button {:vertical-align :middle}),
-       :on-click (fn [e d! m!]
+       :on-click (fn [e d!]
          (try
           (let [started-time (.now js/Date)
                 result (generate-statements (read-string (:content store)) {:inline? true})]

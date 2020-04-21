@@ -1,6 +1,6 @@
 {
   "name": "cirru-writer-clj",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Cirru writer in Clojure",
   "main": "target/main.js",
   "directories": {

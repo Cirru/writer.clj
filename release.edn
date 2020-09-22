@@ -1,4 +1,4 @@
-{:version "0.1.7",
+{:version "0.1.8-a1",
  :group-id "cirru",
  :artifact-id "writer",
  :skip-tag true,

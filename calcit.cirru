@@ -51,7 +51,7 @@
             :data $ {}
               |T $ {} (:type :leaf) (:text |def) (:id |H1M34XDlbG) (:by |root) (:at 1512235829025)
               |j $ {} (:type :leaf) (:text |allowed-chars) (:id |r17n47De-M) (:by |root) (:at 1512235828386)
-              |r $ {} (:type :leaf) (:text ||-_@#$%!?^*=+|\/<>[]{}.,:;') (:id |S1lRNQDebf) (:by |Sk6m_HRlG) (:at 1574570030386)
+              |r $ {} (:type :leaf) (:text "||-~_@#$&%!?^*=+|\\/<>[]{}.,:;'") (:id |S1lRNQDebf) (:by |Sk6m_HRlG) (:at 1600756474130)
           |generate-tree $ {} (:type :expr) (:id |Syl4FYJgZz) (:by |root) (:at 1512204668266)
             :data $ {}
               |T $ {} (:type :leaf) (:text |defn) (:id |rk-NtYylZf) (:by |root) (:at 1512204668266)

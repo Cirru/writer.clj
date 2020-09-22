@@ -3,7 +3,7 @@
   (:require [clojure.string :as string]
             [cirru-writer.list :refer [transform-dollar transform-comma]]))
 
-(def allowed-chars "-_@#$%!?^*=+|\\/<>[]{}.,:;'")
+(def allowed-chars "-~_@#$&%!?^*=+|\\/<>[]{}.,:;'")
 
 (defn boxed? [expr] (every? vector? expr))
 

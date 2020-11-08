@@ -87,7 +87,7 @@
                                (render-newline next-level))
                              (generate-tree
                               cursor
-                              (= prev-kind :boxed-expr)
+                              (or (= prev-kind :boxed-expr) (= prev-kind :expr))
                               options
                               next-level))))))
             result (if (or (and (= prev-kind :leaf) (contains? #{:leaf :simple-expr} kind))

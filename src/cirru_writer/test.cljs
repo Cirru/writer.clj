@@ -90,6 +90,15 @@
     (is (= (write-code data) expected)))))
 
 (deftest
+ nested-2-test
+ (let [data (read-string (slurp "examples/ast/nested-2.edn"))
+       expected (slurp "examples/cirru/nested-2.cirru")]
+   (testing
+    "writing case for nested-2"
+    (is (= (parse expected) data))
+    (is (= (write-code data) expected)))))
+
+(deftest
  parentheses-test
  (let [data (read-string (slurp "examples/ast/parentheses.edn"))
        expected (slurp "examples/cirru/parentheses.cirru")]

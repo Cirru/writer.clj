@@ -1,13 +1,18 @@
 
 (ns cirru-writer.list )
 
+(defn simple? [expr] (and (vector? expr) (every? string? expr)))
+
 (defn vec-add [acc xs] (if (empty? xs) acc (recur (conj acc (first xs)) (rest xs))))
 
 (defn transform-comma [xs]
   (loop [acc [], chunk [], nodes xs, prev-kind nil]
     (if (empty? nodes)
       (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))
-      (let [cursor (first nodes), kind (if (or (string? cursor) (= cursor [])) :leaf :expr)]
+      (let [cursor (first nodes)
+            kind (if (or (string? cursor) (= cursor []))
+                   :leaf
+                   (if (and (= prev-kind :leaf) (simple? cursor)) :simple-expr :expr))]
         (comment println "loop" acc chunk nodes (pr-str cursor) kind prev-kind)
         (if (or (and (= kind :leaf) (= prev-kind :expr))
                 (and (= kind :leaf) (not (empty? chunk))))

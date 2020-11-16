@@ -1,7 +1,7 @@
 
 (ns cirru-writer.core
   (:require [clojure.string :as string]
-            [cirru-writer.list :refer [transform-dollar transform-comma]]))
+            [cirru-writer.list :refer [transform-dollar transform-comma simple?]]))
 
 (def allowed-chars "-~_@#$&%!?^*=+|\\/<>[]{}.,:;'")
 
@@ -44,8 +44,6 @@
   ([acc n] (if (zero? n) acc (recur (str acc "  ") (dec n)))))
 
 (defn render-newline [x] (str "\n" (render-spaces x)))
-
-(defn simple? [expr] (and (vector? expr) (every? string? expr)))
 
 (defn generate-tree [expr insist-head? options level]
   (loop [acc "", exprs expr, head? true, prev-kind nil]

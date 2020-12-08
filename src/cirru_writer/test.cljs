@@ -54,6 +54,20 @@
     (is (= (write-code data) expected)))))
 
 (deftest
+ html-test
+ (let [data (read-string (slurp "examples/ast/html.edn"))
+       expected (slurp "examples/cirru/html.cirru")
+       expected-inline (slurp "examples/cirru/html-inline.cirru")]
+   (testing
+    "writing case for html"
+    (is (= (parse expected) data))
+    (is (= (write-code data) expected)))
+   (testing
+    "writing case for html inline"
+    (is (= (parse expected-inline) data))
+    (is (= (write-code data {:inline? true}) expected-inline)))))
+
+(deftest
  indent-test
  (let [data (read-string (slurp "examples/ast/indent.edn"))
        expected (slurp "examples/cirru/indent.cirru")]
@@ -70,6 +84,15 @@
     "writing case for inline-let"
     (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
+
+(deftest
+ inline-mode-test
+ (let [data (read-string (slurp "examples/ast/inline-mode.edn"))
+       expected (slurp "examples/cirru/inline-mode.cirru")]
+   (testing
+    "writing case for inline-mode"
+    (is (= (parse expected) data))
+    (is (= (write-code data {:inline? true}) expected)))))
 
 (deftest
  inline-simple-test

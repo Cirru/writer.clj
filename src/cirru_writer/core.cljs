@@ -50,7 +50,12 @@
 
 (defn generate-tree [expr insist-head? options level]
   (loop [acc "", exprs expr, head? true, prev-kind nil]
-    (comment println "loop" (pr-str acc) exprs head? prev-kind)
+    (comment
+     do
+     (println "loop:" prev-kind head?)
+     (println "    =>" (pr-str acc))
+     (println "    =>" exprs)
+     (println "    =>" head? insist-head?))
     (if (empty? exprs)
       acc
       (let [cursor (first exprs)
@@ -61,6 +66,7 @@
                    (boxed? cursor) :boxed-expr
                    :else :expr)
             next-level (inc level)
+            child-insist-head? (or (= prev-kind :boxed-expr) (= prev-kind :expr))
             child (cond
                     (= kind :leaf) (generate-leaf cursor)
                     (and head? insist-head?) (generate-inline-expr cursor)
@@ -72,21 +78,17 @@
                         :else
                           (str
                            (render-newline next-level)
-                           (generate-tree cursor false options next-level)))
+                           (generate-tree cursor child-insist-head? options next-level)))
                     (= kind :expr)
                       (str
                        (render-newline next-level)
-                       (generate-tree cursor false options next-level))
+                       (generate-tree cursor child-insist-head? options next-level))
                     (= kind :boxed-expr)
                       (str
                        (if (contains? #{:leaf :simple-expr nil} prev-kind)
                          char-nothing
                          (render-newline next-level))
-                       (generate-tree
-                        cursor
-                        (or (= prev-kind :boxed-expr) (= prev-kind :expr))
-                        options
-                        next-level))
+                       (generate-tree cursor child-insist-head? options next-level))
                     :else (throw (js/Error. "Unknown")))
             result (cond
                      (and (= prev-kind :leaf) (= kind :leaf)) (str char-space child)
@@ -100,9 +102,11 @@
          (rest exprs)
          false
          (if (= kind :simple-expr)
-           (if (:inline? options)
-             (if (contains? #{:leaf :simple-expr} prev-kind) :simple-expr :expr)
-             (if (= prev-kind :leaf) :simple-expr :expr))
+           (if (and head? insist-head?)
+             :simple-expr
+             (if (:inline? options)
+               (if (contains? #{:leaf :simple-expr} prev-kind) :simple-expr :expr)
+               (if (= prev-kind :leaf) :simple-expr :expr)))
            kind))))))
 
 (defn generate-statements [exprs options]

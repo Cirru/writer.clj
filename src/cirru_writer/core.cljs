@@ -1,7 +1,6 @@
 
 (ns cirru-writer.core
-  (:require [clojure.string :as string]
-            [cirru-writer.list :refer [transform-dollar transform-comma simple?]]))
+  (:require [clojure.string :as string] [cirru-writer.list :refer [transform-dollar simple?]]))
 
 (def allowed-chars "-~_@#$&%!?^*=+|\\/<>[]{}.,:;'")
 
@@ -25,6 +24,10 @@
   (if (= leaf []) "()" (if (every? char-allowed? leaf) leaf (pr-str leaf))))
 
 (defn generate-inline-expr [expr]
+  (comment
+   if
+   (and false (simple? expr) (= "," (first expr)))
+   (->> (rest expr) (map generate-leaf) (string/join " ")))
   (str
    char-open
    (loop [result "", nodes expr, head? true]
@@ -57,52 +60,53 @@
                    (simple? cursor) :simple-expr
                    (boxed? cursor) :boxed-expr
                    :else :expr)
-            child (if (= kind :leaf)
-                    (generate-leaf cursor)
-                    (if (and head? insist-head?)
-                      (generate-inline-expr cursor)
-                      (case kind
-                        :simple-expr
-                          (cond
-                            (= prev-kind :leaf) (generate-inline-expr cursor)
-                            (and (:inline? options) (= prev-kind :simple-expr))
-                              (str char-space (generate-inline-expr cursor))
-                            :else
-                              (let [next-level (inc level)]
-                                (str
-                                 (render-newline next-level)
-                                 (generate-tree cursor false options next-level))))
-                        :expr
-                          (let [next-level (inc level)]
-                            (str
-                             (render-newline next-level)
-                             (generate-tree cursor false options next-level)))
-                        :boxed-expr
-                          (let [next-level (inc level)]
-                            (str
-                             (if (contains? #{:leaf :simple-expr nil} prev-kind)
-                               char-nothing
-                               (render-newline next-level))
-                             (generate-tree
-                              cursor
-                              (or (= prev-kind :boxed-expr) (= prev-kind :expr))
-                              options
-                              next-level))))))
-            result (if (or (and (= prev-kind :leaf) (contains? #{:leaf :simple-expr} kind))
-                           (and (contains? #{:leaf :simple-expr} prev-kind) (= kind :leaf)))
-                     (str char-space child)
-                     child)]
+            next-level (inc level)
+            child (cond
+                    (= kind :leaf) (generate-leaf cursor)
+                    (and head? insist-head?) (generate-inline-expr cursor)
+                    (= kind :simple-expr)
+                      (cond
+                        (= prev-kind :leaf) (generate-inline-expr cursor)
+                        (and (:inline? options) (= prev-kind :simple-expr))
+                          (str char-space (generate-inline-expr cursor))
+                        :else
+                          (str
+                           (render-newline next-level)
+                           (generate-tree cursor false options next-level)))
+                    (= kind :expr)
+                      (str
+                       (render-newline next-level)
+                       (generate-tree cursor false options next-level))
+                    (= kind :boxed-expr)
+                      (str
+                       (if (contains? #{:leaf :simple-expr nil} prev-kind)
+                         char-nothing
+                         (render-newline next-level))
+                       (generate-tree
+                        cursor
+                        (or (= prev-kind :boxed-expr) (= prev-kind :expr))
+                        options
+                        next-level))
+                    :else (throw (js/Error. "Unknown")))
+            result (cond
+                     (and (= prev-kind :leaf) (= kind :leaf)) (str char-space child)
+                     (and (= prev-kind :leaf) (= kind :simple-expr)) (str char-space child)
+                     (and (= prev-kind :simple-expr) (= kind :leaf)) (str char-space child)
+                     (and (= kind :leaf) (or (= prev-kind :expr) (= prev-kind :boxed-expr)))
+                       (str (render-newline (inc level)) ", " child)
+                     :else child)]
         (recur
          (if (empty? acc) result (str acc result))
          (rest exprs)
          false
-         (if (and (:inline? options) (= kind :simple-expr))
-           (if (contains? #{:leaf :simple-expr} prev-kind) :simple-expr :expr)
+         (if (= kind :simple-expr)
+           (if (:inline? options)
+             (if (contains? #{:leaf :simple-expr} prev-kind) :simple-expr :expr)
+             (if (= prev-kind :leaf) :simple-expr :expr))
            kind))))))
 
 (defn generate-statements [exprs options]
   (->> exprs
-       (transform-comma)
        (transform-dollar)
        (map
         (fn [xs]

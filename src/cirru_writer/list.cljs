@@ -4,28 +4,3 @@
 (defn simple? [expr] (and (vector? expr) (every? string? expr)))
 
 (defn vec-add [acc xs] (if (empty? xs) acc (recur (conj acc (first xs)) (rest xs))))
-
-(defn transform-dollar
-  ([xs] (transform-dollar xs false))
-  ([xs at-dollar?]
-   (if (string? xs)
-     xs
-     (loop [acc [], nodes xs, prev-kind nil, head? true]
-       (if (empty? nodes)
-         acc
-         (let [cursor (first nodes)
-               kind (if (string? cursor) :leaf :expr)
-               dollar-tail? (and (not head?)
-                                 (= prev-kind :leaf)
-                                 (not at-dollar?)
-                                 (vector? cursor)
-                                 (empty? (rest nodes)))]
-           (comment println "checking" cursor dollar-tail?)
-           (if dollar-tail?
-             (let [next-acc (vec-add acc (vec-add ["$"] (transform-dollar cursor true)))]
-               (recur next-acc (rest nodes) kind false))
-             (recur
-              (conj acc (if (= kind :leaf) cursor (transform-dollar cursor false)))
-              (rest nodes)
-              kind
-              false))))))))

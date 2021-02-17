@@ -5,25 +5,6 @@
 
 (defn vec-add [acc xs] (if (empty? xs) acc (recur (conj acc (first xs)) (rest xs))))
 
-(defn transform-comma [xs]
-  (loop [acc [], chunk [], nodes xs, prev-kind nil]
-    (if (empty? nodes)
-      (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))
-      (let [cursor (first nodes)
-            kind (if (or (string? cursor) (= cursor []))
-                   :leaf
-                   (if (and (= prev-kind :leaf) (simple? cursor)) :simple-expr :expr))]
-        (comment println "loop" acc chunk nodes (pr-str cursor) kind prev-kind)
-        (if (or (and (= kind :leaf) (= prev-kind :expr))
-                (and (= kind :leaf) (not (empty? chunk))))
-          (recur acc (conj chunk cursor) (rest nodes) kind)
-          (let [checked-acc (if (empty? chunk) acc (conj acc (vec-add [","] chunk)))]
-            (recur
-             (conj checked-acc (if (string? cursor) cursor (transform-comma cursor)))
-             []
-             (rest nodes)
-             kind)))))))
-
 (defn transform-dollar
   ([xs] (transform-dollar xs false))
   ([xs at-dollar?]

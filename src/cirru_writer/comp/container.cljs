@@ -1,6 +1,6 @@
 
 (ns cirru-writer.comp.container
-  (:require [respo.core :refer [defcomp div <> textarea button pre a]]
+  (:require [respo.core :refer [defcomp div <> textarea button pre a input]]
             [respo-ui.core :as ui]
             [hsl.core :refer [hsl]]
             [respo.comp.space :refer [=<]]
@@ -31,13 +31,20 @@
        :on-click (fn [e d!]
          (try
           (let [started-time (.now js/Date)
-                result (generate-statements (read-string (:content store)) {:inline? true})]
+                result (generate-statements
+                        (read-string (:content store))
+                        {:inline? (:inline? store)})]
             (println "Cost" (- (.now js/Date) started-time))
             (d! :generate {:result result}))
           (catch js/Error. error (d! :error error))))}
       (<> "Generate"))
      (=< 8 nil)
-     (<> (:error store) {:color :red}))
+     (<> (:error store) {:color :red})
+     (=< 8 nil)
+     (input
+      {:type "checkbox",
+       :checked (:inline? store),
+       :on-change (fn [e d!] (d! :toggle (.-checked (.-target (:event e)))))}))
     (div
      {:style (merge ui/row {:padding "0 8px"})}
      (textarea

@@ -9,6 +9,24 @@
 (defn slurp [x] (fs/readFileSync x "utf8"))
 
 (deftest
+ append-indent-test
+ (let [data (read-string (slurp "examples/ast/append-indent.edn"))
+       expected (slurp "examples/cirru/append-indent.cirru")]
+   (testing
+    "case for append-indent"
+    (is (= (parse expected) data))
+    (is (= (write-code data) expected)))))
+
+(deftest
+ cond-test
+ (let [data (read-string (slurp "examples/ast/cond.edn"))
+       expected (slurp "examples/cirru/cond.cirru")]
+   (testing
+    "writing case for cond"
+    (is (= (parse expected) data))
+    (is (= (write-code data) expected)))))
+
+(deftest
  demo-inline-mode
  (let [data (read-string (slurp "examples/ast/inline-mode.edn"))
        expected (slurp "examples/cirru/inline-mode.cirru")]

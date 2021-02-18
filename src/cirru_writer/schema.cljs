@@ -6,4 +6,4 @@
 (def store
   (let [content "[[\"a\" \"b\"]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"]]\n [\"a\" [\"b\"] \"c\"]\n [\"a\" [[\"b\"] [\"c\"]] [\"d\" [\"e\"]]]]\n"
         result (generate-statements (read-string content) {:inline? false})]
-    {:states {}, :content content, :result result, :error nil}))
+    {:states {}, :content content, :result result, :error nil, :inline? false}))

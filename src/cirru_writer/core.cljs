@@ -50,12 +50,6 @@
 
 (defn generate-tree [expr insist-head? options level in-tail?]
   (loop [acc "", exprs expr, head? true, prev-kind nil, bended? false]
-    (comment
-     do
-     (println "loop:" prev-kind head?)
-     (println "    =>" (pr-str acc))
-     (println "    =>" exprs)
-     (println "    =>" head? insist-head?))
     (if (empty? exprs)
       acc
       (let [cursor (first exprs)
@@ -101,9 +95,15 @@
                             next-level
                             false)))
                     (= kind :expr)
-                      (str
-                       (render-newline next-level)
-                       (generate-tree cursor child-insist-head? options next-level false))
+                      (let [content (generate-tree
+                                     cursor
+                                     child-insist-head?
+                                     options
+                                     next-level
+                                     false)]
+                        (if (string/starts-with? content "\n")
+                          content
+                          (str (render-newline next-level) content)))
                     (= kind :boxed-expr)
                       (str
                        (if (contains? #{:leaf :simple-expr nil} prev-kind)
@@ -119,6 +119,12 @@
                      (and (= kind :leaf) (or (= prev-kind :expr) (= prev-kind :boxed-expr)))
                        (str (render-newline next-level) ", " child)
                      :else child)]
+        (comment
+         do
+         (println "loop:" prev-kind kind head? insist-head?)
+         (println "    =>" (pr-str acc))
+         (println "    =>" exprs)
+         (println "    =>" (pr-str child)))
         (recur
          (if (empty? acc) result (str acc result))
          (rest exprs)

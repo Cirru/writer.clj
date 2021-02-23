@@ -18,6 +18,15 @@
     (is (= (write-code data) expected)))))
 
 (deftest
+ cond-short-test
+ (let [data (read-string (slurp "examples/ast/cond-short.edn"))
+       expected (slurp "examples/cirru/cond-short.cirru")]
+   (testing
+    "writing case for shorter cond"
+    (is (= (parse expected) data))
+    (is (= (write-code data) expected)))))
+
+(deftest
  cond-test
  (let [data (read-string (slurp "examples/ast/cond.edn"))
        expected (slurp "examples/cirru/cond.cirru")]

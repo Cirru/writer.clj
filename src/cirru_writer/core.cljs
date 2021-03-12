@@ -48,8 +48,8 @@
 
 (defn render-newline [x] (str "\n" (render-spaces x)))
 
-(defn generate-tree [expr insist-head? options level in-tail?]
-  (loop [acc "", exprs expr, head? true, prev-kind nil, bended? false]
+(defn generate-tree [expr insist-head? options base-level in-tail?]
+  (loop [acc "", exprs expr, head? true, prev-kind nil, bended-size 0, level base-level]
     (if (empty? exprs)
       acc
       (let [cursor (first exprs)
@@ -70,14 +70,7 @@
                     tail?
                       (if (empty? cursor)
                         "$"
-                        (str
-                         "$ "
-                         (generate-tree
-                          cursor
-                          false
-                          options
-                          (if bended? next-level level)
-                          tail?)))
+                        (str "$ " (generate-tree cursor false options level tail?)))
                     (= kind :leaf) (generate-leaf cursor)
                     (and head? insist-head?) (generate-inline-expr cursor)
                     (= kind :simple-expr)
@@ -111,17 +104,17 @@
                          (render-newline next-level))
                        (generate-tree cursor child-insist-head? options next-level false))
                     :else (throw (js/Error. "Unknown")))
+            bended? (and (= kind :leaf) (or (= prev-kind :expr) (= prev-kind :boxed-expr)))
             result (cond
                      tail? (str char-space child)
                      (and (= prev-kind :leaf) (= kind :leaf)) (str char-space child)
                      (and (= prev-kind :leaf) (= kind :simple-expr)) (str char-space child)
                      (and (= prev-kind :simple-expr) (= kind :leaf)) (str char-space child)
-                     (and (= kind :leaf) (or (= prev-kind :expr) (= prev-kind :boxed-expr)))
-                       (str (render-newline next-level) ", " child)
+                     bended? (str (render-newline next-level) ", " child)
                      :else child)]
         (comment
          do
-         (println "loop:" prev-kind kind head? insist-head?)
+         (println "loop:" prev-kind kind head? insist-head? level bended-size)
          (println "    =>" (pr-str acc))
          (println "    =>" exprs)
          (println "    =>" (pr-str child)))
@@ -136,7 +129,8 @@
                (if (contains? #{:leaf :simple-expr} prev-kind) :simple-expr :expr)
                (if (= prev-kind :leaf) :simple-expr :expr)))
            kind)
-         (or bended? (or (= kind :expr) (= kind :boxed-expr))))))))
+         (if bended? (inc bended-size) bended-size)
+         (if bended? next-level level))))))
 
 (defn generate-statements [exprs options]
   (->> exprs

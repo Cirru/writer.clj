@@ -18,6 +18,15 @@
     (is (= (write-code data) expected)))))
 
 (deftest
+ comma-indent-test
+ (let [data (read-string (slurp "examples/ast/comma-indent.edn"))
+       expected (slurp "examples/cirru/comma-indent.cirru")]
+   (testing
+    "writing case for comma-indent"
+    (is (= (parse expected) data))
+    (is (= (write-code data) expected)))))
+
+(deftest
  cond-short-test
  (let [data (read-string (slurp "examples/ast/cond-short.edn"))
        expected (slurp "examples/cirru/cond-short.cirru")]
@@ -145,15 +154,6 @@
        expected (slurp "examples/cirru/nested-2.cirru")]
    (testing
     "writing case for nested-2"
-    (is (= (parse expected) data))
-    (is (= (write-code data) expected)))))
-
-(deftest
- nested-3-test
- (let [data (read-string (slurp "examples/ast/nested-3.edn"))
-       expected (slurp "examples/cirru/nested-3.cirru")]
-   (testing
-    "writing case for nested-3"
     (is (= (parse expected) data))
     (is (= (write-code data) expected)))))
 
